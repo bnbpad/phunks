@@ -105,7 +105,7 @@
   },
   "agentsPage": {
     "title": "所有AI代理",
-    "subtitle": "BSC上所有AI代理的综合列表",
+    "subtitle": "",
     "stats": {
       "totalStrategies": "总代理数",
       "profitable": "盈利数",
@@ -176,7 +176,7 @@
   },
   "leaderboard": {
     "title": "排行榜",
-    "subtitle": "BSC上表现最佳的AI代理",
+    "subtitle": "",
     "stats": {
       "totalAgents": "总代理数",
       "activeTrades": "活跃交易",

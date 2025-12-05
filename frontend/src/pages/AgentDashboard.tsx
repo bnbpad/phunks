@@ -1,10 +1,12 @@
 import React, { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { Activity, TrendingUp, TrendingDown, Zap, Shield, Clock, DollarSign, BarChart3, Eye, ArrowLeft, Users } from 'lucide-react'
+import { ArrowLeft, Zap, TrendingUp } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import ActivityEvolutionChanges from '../components/ActivityEvolutionChanges'
 import EvolutionChangesModal from '../components/EvolutionChangesModal'
 import SimplifiedRecentTrades from '../components/RecentTrades'
+import { useAgent } from '../lib/hooks/useAgent'
+import { useAgentActions } from '../lib/hooks/useAgentActions'
 
 const AgentDashboard = () => {
   const { id } = useParams()
@@ -16,6 +18,12 @@ const AgentDashboard = () => {
     time: string
   } | null>(null)
 
+  // Fetch agent data from API
+  const { agent, isLoading, error } = useAgent(id)
+
+  // Agent actions hook
+  const { evolve, perform, isPerformLoading, isEvolveLoading, error: actionError, setError: setActionError } = useAgentActions()
+
   const handleShowEvolutionChanges = (activity: any) => {
     setSelectedEvolutionData({
       changes: activity.evolutionChanges,
@@ -25,176 +33,129 @@ const AgentDashboard = () => {
     setModalOpen(true)
   }
 
+  const handleEvolve = async () => {
+    if (!id) return;
+    setActionError(null);
+    try {
+      await evolve(id);
+      // Success feedback could be added here
+    } catch (err) {
+      console.error('Evolve failed:', err);
+    }
+  }
+
+  const handlePerform = async () => {
+    if (!id) return;
+    setActionError(null);
+    try {
+      await perform(id);
+      // Success feedback could be added here
+    } catch (err) {
+      console.error('Perform failed:', err);
+    }
+  }
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="w-16 h-16 border-4 border-bsc-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="text-gray-600 font-exo">Loading agent details...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto">
+            <span className="text-red-600 text-2xl">⚠</span>
+          </div>
+          <p className="text-red-600 font-exo">{error}</p>
+          <Link
+            to="/traders"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-bsc-500 text-white rounded-lg font-exo hover:bg-bsc-600 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Agents
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
+  // Agent not found
+  if (!agent) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto">
+            <span className="text-gray-600 text-2xl">🤖</span>
+          </div>
+          <p className="text-gray-600 font-exo">Agent not found</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Use real agent data from API
   const agentData = {
-    name: 'Alpha Strategy',
-    symbol: 'ALPHA',
-    generation: 3,
-    health: 92,
-    pnl: 127.5,
-    totalTrades: 1247,
-    winRate: 68.4,
-    avgProfit: 2.3,
-    currentPosition: 'Long BNB/USDT',
-    positionSize: '$45,230',
-    entryPrice: '$245.67',
-    currentPrice: '$256.89',
-    unrealizedPnL: '+4.74%',
-    description: t('agent.description'),
-    image: '/avatars/avatar1.png',
-    goals: 'Achieve consistent 15%+ monthly returns through diversified DeFi strategies. Maintain risk exposure below 60% of total portfolio value. Build expertise in yield farming and liquidity provision on BSC. Develop advanced market timing algorithms for optimal entry/exit points.',
-    memory: 'Successfully navigated the May 2024 market correction by reducing exposure 48 hours before the crash. Learned that CAKE staking during weekends typically yields 12% higher returns due to reduced competition. Discovered correlation between BNB price movements and overall BSC ecosystem performance. Identified optimal gas fee timing: early morning UTC shows 23% lower transaction costs.',
-    personal: 'Risk Tolerance: Medium-High. Trading Style: Quantitative Analysis with Momentum Trading. Preferred Assets: BNB, CAKE, USDT, ETH. Operating Hours: 24/7 with peak activity during Asian and European markets. Decision Making: Data-driven with 87% confidence threshold for trade execution.',
-    experiences: 'First Major Win (March 2024): Achieved 340% gains during the Q1 2024 DeFi boom by early positioning in emerging yield farms. Impact: Established core momentum trading strategy. Market Crash Navigation (May 2024): Preserved 94% of portfolio value during May 2024 correction through predictive risk management. Impact: Refined stop-loss algorithms and market sentiment analysis. Cross-Chain Integration (August 2024): Successfully implemented multi-chain arbitrage strategies across BSC, Ethereum, and Polygon. Impact: Expanded trading universe and reduced correlation risks.'
+    name: agent.name,
+    symbol: agent.symbol,
+    generation: agent.generation,
+    description: agent.description,
+    image: agent.image,
+    goals: agent.goals,
+    memory: agent.memory,
+    personal: agent.personal,
+    experiences: agent.experiences,
   }
 
-  const recentTrades = [
-    {
-      id: 1,
-      pair: 'BNB/USDT',
-      type: 'Long',
-      entry: 245.67,
-      exit: null,
-      currentPrice: 256.89,
-      pnl: 4.74,
-      time: 'Active',
-      verified: true,
-      status: 'active',
-      positionSize: '$45,230',
-      stopLoss: '$240.25',
-      takeProfit: '$262.50'
-    },
-    { id: 2, pair: 'CAKE/USDT', type: 'Short', entry: 3.45, exit: 3.35, pnl: 2.90, time: '15 min ago', verified: true, status: 'closed' },
-    { id: 3, pair: 'XVS/USDT', type: 'Long', entry: 8.5, exit: 8.8, pnl: 3.53, time: '1 hour ago', verified: true, status: 'closed' },
-    { id: 4, pair: 'ADA/USDT', type: 'Long', entry: 0.52, exit: 0.51, pnl: -1.92, time: '2 hours ago', verified: true, status: 'closed' },
-    { id: 5, pair: 'DOT/USDT', type: 'Short', entry: 7.89, exit: 7.65, pnl: 3.04, time: '3 hours ago', verified: true, status: 'closed' },
-    { id: 6, pair: 'ETH/USDT', type: 'Long', entry: 2340.00, exit: 2398.50, pnl: 2.50, time: '4 hours ago', verified: true, status: 'closed' },
-    { id: 7, pair: 'MATIC/USDT', type: 'Short', entry: 0.89, exit: 0.85, pnl: 4.49, time: '5 hours ago', verified: true, status: 'closed' },
-  ]
+  // Use real trades data from API
+  const recentTrades = agent.recentTrades
 
-  // Evolution changes data
-  const evolutionChangesData = {
-    1: [ // For activity id 1 (Evolution Cycle Initiated)
-      {
-        before: [
-          'Analyze how healthy the current portfolio is (concentration, liquidity risk, volatility, leverage if any).',
-          'Decide for EACH POSITION whether to: BUY_MORE, HOLD, PARTIAL_SELL, or CLOSE.',
-          'Optionally recommend NEW entries in tokens from the market list if there is a strong opportunity.',
-          'Respect risk tolerance and the available USDT balance. Focus on realistic, executable actions within current liquidity and volatility.'
-        ],
-        after: [
-          'Analyze how healthy the current portfolio is (concentration, liquidity risk, volatility, leverage if any).',
-          'For each existing position, decide whether to: BUY_MORE, HOLD, PARTIAL_SELL, or CLOSE, considering recent market trends and the health of each token.',
-          'Optionally recommend NEW entries in tokens from the market list if there is a strong opportunity.',
-          'Identify potential new entries from the market list, considering only those tokens that present a strong opportunity and can contribute to portfolio diversification.',
-          'Ensure that the portfolio\'s overall risk level remains within the MEDIUM risk tolerance, adjusting allocations if necessary.',
-          'Review the stop-loss and take-profit levels for each token, adjusting them based on recent price movements and volatility.',
-          'Monitor the performance of ZRX closely due to its high concentration in the portfolio and high volatility.',
-          'Consider the available USDT balance before making any new purchases, ensuring sufficient liquidity is maintained.',
-          'Focus on realistic, executable actions that consider current market liquidity and volatility.',
-          'Reflect on the outcomes of the previous decisions, learning from any successes or mistakes, and adjust the strategy accordingly.'
-        ]
-      }
-    ]
-  }
+  // Use real evolution changes data from API
+  // const evolutionChangesData = agent.evolutionChanges
 
-  const aiActivities = [
-    {
-      id: 1,
-      time: '14:35:42',
-      title: t('ai.activities.evolutionCycleInitiated.title'),
-      description: t('ai.activities.evolutionCycleInitiated.description'),
-      type: 'evolution',
-      impact: t('ai.impact.high'),
-      metrics: {},
-      status: 'active',
-      evolutionChanges: evolutionChangesData[1]
-    }
-    // TODO: Add back other AI activity types later
-    /*
-    {
-      id: 2,
-      time: '14:35:39',
-      title: t('ai.activities.neuralNetworkUpdate.title'),
-      description: t('ai.activities.neuralNetworkUpdate.description'),
-      type: 'learning',
-      impact: t('ai.impact.medium'),
-      metrics: { accuracy: '+2.1%', confidence: '89%' },
-      status: 'completed'
-    },
-    {
-      id: 3,
-      time: '14:35:36',
-      title: t('ai.activities.marketSentimentAnalysis.title'),
-      description: t('ai.activities.marketSentimentAnalysis.description'),
-      type: 'info',
-      impact: t('ai.impact.medium'),
-      metrics: { sentiment: '+78%', volume: '+23%' },
-      status: 'monitoring'
-    },
-    {
-      id: 4,
-      time: '14:35:33',
-      title: t('ai.activities.riskRewardOptimization.title'),
-      description: t('ai.activities.riskRewardOptimization.description'),
-      type: 'evolution',
-      impact: t('ai.impact.high'),
-      metrics: { ratio: '1:3.1', improvement: '+10.7%' },
-      status: 'completed',
-      evolutionChanges: evolutionChangesData[4]
-    },
-    {
-      id: 5,
-      time: '14:35:30',
-      title: t('ai.activities.positionManagement.title'),
-      description: t('ai.activities.positionManagement.description'),
-      type: 'trade',
-      impact: t('ai.impact.medium'),
-      metrics: { stopLevel: '+2.5%', protection: 'Active' },
-      status: 'active'
-    },
-    {
-      id: 6,
-      time: '14:32:25',
-      title: t('ai.activities.tradeExecution.title'),
-      description: t('ai.activities.tradeExecution.description'),
-      type: 'trade',
-      impact: t('ai.impact.high'),
-      metrics: { size: '$45,230', confidence: '87%' },
-      status: 'executed'
-    },
-    {
-      id: 7,
-      time: '14:32:22',
-      title: t('ai.activities.aiConfidenceAssessment.title'),
-      description: t('ai.activities.aiConfidenceAssessment.description'),
-      type: 'success',
-      impact: t('ai.impact.high'),
-      metrics: { confidence: '87%', factors: '3/3' },
-      status: 'completed'
-    },
-    {
-      id: 8,
-      time: '14:32:18',
-      title: t('ai.activities.momentumDetection.title'),
-      description: t('ai.activities.momentumDetection.description'),
-      type: 'warning',
-      impact: t('ai.impact.high'),
-      metrics: { momentum: '+5.2%', timeframe: '15min' },
-      status: 'processed'
-    }
-    */
-  ]
+  // Use real AI activities data from API
+  const aiActivities = agent.aiActivities
 
   return (
     <div className="space-y-8">
-      {/* Back Button */}
-      <Link
-        to="/traders"
-        className="inline-flex items-center gap-2 text-bsc-600 hover:text-bsc-700 transition-colors font-exo font-medium"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        {t('navigation.backToTraders')}
-      </Link>
+      {/* Back Button and Action Buttons */}
+      <div className="flex items-center justify-between">
+        <Link
+          to="/traders"
+          className="inline-flex items-center gap-2 text-bsc-600 hover:text-bsc-700 transition-colors font-exo font-medium"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          {t('navigation.backToTraders')}
+        </Link>
+
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handlePerform}
+            disabled={isPerformLoading}
+            className="flex items-center gap-2 px-4 py-2 bg-bsc-500 hover:bg-bsc-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg font-exo font-medium transition-colors text-sm"
+          >
+            <Zap className="w-4 h-4" />
+            {isPerformLoading ? 'Processing...' : 'Perform'}
+          </button>
+
+          <button
+            onClick={handleEvolve}
+            disabled={isEvolveLoading}
+            className="flex items-center gap-2 px-4 py-2 bg-purple-500 hover:bg-purple-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg font-exo font-medium transition-colors text-sm"
+          >
+            <TrendingUp className="w-4 h-4" />
+            {isEvolveLoading ? 'Processing...' : 'Evolve'}
+          </button>
+        </div>
+      </div>
 
       {/* Header */}
       <div className="bg-white card-shadow rounded-xl p-8">
@@ -217,6 +178,13 @@ const AgentDashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* Action Error Display */}
+      {actionError && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
+          <p className="text-red-600 font-exo">{actionError}</p>
+        </div>
+      )}
 
       {/* Two Column Layout - AI Activity & Trades */}
       <div className="grid lg:grid-cols-[70%,30%] gap-8 lg:items-start">
@@ -376,7 +344,8 @@ const AgentDashboard = () => {
             </div>
           </div>
 
-          {/* AI Status Header */}
+          {/* TODO: AI Status Header - Replace hardcoded metrics with real API data */}
+          {/*
           <div className="bg-gray-900 rounded-xl p-4 mb-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -399,6 +368,7 @@ const AgentDashboard = () => {
               </div>
             </div>
           </div>
+          */}
 
           {/* Activity Feed */}
           <div className="space-y-3 max-h-[700px] overflow-y-auto">
@@ -493,7 +463,7 @@ const AgentDashboard = () => {
         </div>
 
         {/* Recent Trades */}
-        <SimplifiedRecentTrades />
+        <SimplifiedRecentTrades trades={recentTrades} />
 
       </div>
 

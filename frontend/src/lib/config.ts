@@ -3,6 +3,11 @@ import AgentLaunchpadABI from './abi/AgentLaunchpad.json';
 
 // Application Configuration
 export const config = {
+  // API Configuration
+  api: {
+    baseURL: 'https://fd32c497428a.ngrok-free.app'
+  },
+
   // WalletConnect Project ID (get from https://cloud.walletconnect.com)
   walletConnect: {
     projectId: 'your_project_id_here'
@@ -28,7 +33,7 @@ export const config = {
       abi: TokenManagerABI
     },
     agentLaunchpad: {
-      address: '0x209f28b4E3bca2528839f3D9C349262828738454',
+      address: '0x10c0043Dcd70054E8f040fa199FD5B3Ed2Dbb7A3',
       abi: AgentLaunchpadABI
     },
     agentNFT: '0x742d35Cc6634C0532925a3b8D91d99e2c4b851E8',
