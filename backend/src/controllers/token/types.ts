@@ -1,5 +1,5 @@
-import { IPool, TokenLinks } from '../../database/token';
-import { IAiThesisPayload } from '../../database/aiThesis';
+import { IPool, TokenLinks } from "../../database/token";
+import { IAiThesisPayload } from "../../database/aiThesis";
 
 export interface ICreateToken {
   basicDetails: {
