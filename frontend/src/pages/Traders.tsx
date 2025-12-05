@@ -2,14 +2,30 @@ import React, { useState } from 'react'
 import { Search, Filter, SortDesc, TrendingUp, Users, Target, BarChart3 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import AgentCard from '../components/AgentCard'
+import { useAgents } from '../lib/hooks/useAgent'
 
 const Traders = () => {
   const { t } = useTranslation('common')
   const [searchTerm, setSearchTerm] = useState('')
-  const [sortBy, setSortBy] = useState('performance')
+  const [sortBy, setSortBy] = useState('pnl')
   const [filterBy, setFilterBy] = useState('all')
 
-  // Extended list of all agents
+  // Use real API data
+  const { agents, isLoading, error, pagination } = useAgents({
+    search: searchTerm,
+    sortBy: sortBy as any,
+    sortOrder: 'desc'
+  })
+
+  // Client-side filtering for non-API supported filters
+  const filteredAgents = agents.filter(agent => {
+    if (filterBy === 'profitable') return agent.pnl > 0
+    if (filterBy === 'losing') return agent.pnl < 0
+    if (filterBy === 'high-performance') return agent.health >= 80
+    return true
+  })
+
+  // Keep original static data as fallback (remove this after API testing)
   const allAgents = [
     {
       id: '1',
@@ -163,38 +179,39 @@ const Traders = () => {
     }
   ]
 
-  // Filter and sort agents
-  const filteredAgents = allAgents
-    .filter(agent => {
-      const matchesSearch = agent.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           agent.symbol.toLowerCase().includes(searchTerm.toLowerCase())
-
-      if (filterBy === 'profitable') return matchesSearch && agent.pnl > 0
-      if (filterBy === 'losing') return matchesSearch && agent.pnl < 0
-      if (filterBy === 'high-performance') return matchesSearch && agent.health >= 80
-
-      return matchesSearch
-    })
-    .sort((a, b) => {
-      switch (sortBy) {
-        case 'performance':
-          return b.pnl - a.pnl
-        case 'health':
-          return b.health - a.health
-        case 'trades':
-          return b.trades - a.trades
-        case 'name':
-          return a.name.localeCompare(b.name)
-        default:
-          return 0
-      }
-    })
+  // Note: Filtering and sorting now handled by API, fallback logic exists above
 
   const stats = {
-    total: allAgents.length,
-    profitable: allAgents.filter(t => t.pnl > 0).length,
-    totalVolume: allAgents.reduce((sum, t) => sum + t.trades, 0),
-    avgPerformance: (allAgents.reduce((sum, t) => sum + t.pnl, 0) / allAgents.length).toFixed(1)
+    total: pagination?.totalAgents || agents.length,
+    profitable: agents.filter(t => t.pnl > 0).length,
+    totalVolume: agents.reduce((sum, t) => sum + t.trades, 0),
+    avgPerformance: agents.length > 0 ? (agents.reduce((sum, t) => sum + t.pnl, 0) / agents.length).toFixed(1) : '0.0'
+  }
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="w-16 h-16 border-4 border-bsc-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="text-gray-600 font-exo">Loading agents...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto">
+            <span className="text-red-600 text-2xl">⚠</span>
+          </div>
+          <p className="text-red-600 font-exo">{error}</p>
+        </div>
+      </div>
+    )
   }
 
   return (
