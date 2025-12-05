@@ -1,28 +1,26 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721URIStorageUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "openzeppelin-contracts-upgradeable/contracts/token/ERC721/ERC721Upgradeable.sol";
+import "openzeppelin-contracts-upgradeable/contracts/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
+import "openzeppelin-contracts-upgradeable/contracts/token/ERC721/extensions/ERC721URIStorageUpgradeable.sol";
+import "openzeppelin-contracts-upgradeable/contracts/access/OwnableUpgradeable.sol";
+import "openzeppelin-contracts-upgradeable/contracts/proxy/utils/UUPSUpgradeable.sol";
 
 /**
  * @title BAP578
  * @dev NFT contract for Non-Fungible Agents with structured metadata
  */
-contract AgentNFT is
-    ERC721Upgradeable,
-    ERC721EnumerableUpgradeable,
-    ERC721URIStorageUpgradeable,
-    ReentrancyGuardUpgradeable,
-    OwnableUpgradeable,
-    UUPSUpgradeable
-{
+contract AgentNFT is ERC721EnumerableUpgradeable, OwnableUpgradeable, UUPSUpgradeable {
     // ============================================
     // STRUCTS
     // ============================================
+
+    /// @custom:storage-location erc7201:openzeppelin.storage.ERC721URIStorage
+    struct ERC721URIStorageStorage {
+        // Optional mapping for token URIs
+        mapping(uint256 tokenId => string) _tokenURIs;
+    }
 
     struct AgentMetadata {
         string persona; // JSON-encoded string for character traits, style, tone
@@ -97,24 +95,25 @@ contract AgentNFT is
         _;
     }
 
+    // keccak256(abi.encode(uint256(keccak256("openzeppelin.storage.ERC721URIStorage")) - 1)) & ~bytes32(uint256(0xff))
+    bytes32 private constant ERC721URIStorageStorageLocation =
+        0x0542a41881ee128a365a727b282c86fa859579490b9bb45aab8503648c8e7900;
+
+    function _getERC721URIStorageStorage() private pure returns (ERC721URIStorageStorage storage $) {
+        assembly {
+            $.slot := ERC721URIStorageStorageLocation
+        }
+    }
+
     // ============================================
     // INITIALIZATION
     // ============================================
-
-    /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor() {
-        _disableInitializers();
-    }
 
     function initialize(string memory name, string memory symbol, address treasury) public initializer {
         require(treasury != address(0), "Invalid treasury");
 
         __ERC721_init(name, symbol);
         __ERC721Enumerable_init();
-        __ERC721URIStorage_init();
-        __ReentrancyGuard_init();
-        __Ownable_init();
-        __UUPSUpgradeable_init();
 
         treasuryAddress = treasury;
         freeMintsPerUser = 3;
@@ -132,7 +131,7 @@ contract AgentNFT is
         address logicAddress,
         string memory metadataURI,
         AgentMetadata memory extendedMetadata
-    ) external payable whenNotPaused nonReentrant returns (uint256) {
+    ) external payable whenNotPaused returns (uint256) {
         require(to != address(0), "Cannot mint to zero address");
         require(logicAddress == address(0) || logicAddress.code.length > 0, "Invalid logic address");
 
@@ -157,7 +156,7 @@ contract AgentNFT is
         // Mint NFT
         uint256 tokenId = ++_tokenIdCounter;
         _safeMint(to, tokenId);
-        _setTokenURI(tokenId, metadataURI);
+        // _setTokenURI(tokenId, metadataURI);
 
         // Initialize agent state
         agentStates[tokenId] =
@@ -182,7 +181,7 @@ contract AgentNFT is
     /**
      * @dev Withdraw funds from agent (owner only)
      */
-    function withdrawFromAgent(uint256 tokenId, uint256 amount) external onlyTokenOwner(tokenId) nonReentrant {
+    function withdrawFromAgent(uint256 tokenId, uint256 amount) external onlyTokenOwner(tokenId) {
         require(agentStates[tokenId].balance >= amount, "Insufficient balance");
 
         // Update state first
@@ -208,10 +207,8 @@ contract AgentNFT is
      * @dev Update logic address for an agent
      * @dev Logic address must be either zero address or a contract address
      */
-    function setLogicAddress(uint256 tokenId, address newLogicAddress) external onlyTokenOwner(tokenId) {
-        require(newLogicAddress == address(0) || newLogicAddress.code.length > 0, "Invalid logic address");
-        agentStates[tokenId].logicAddress = newLogicAddress;
-        emit LogicAddressUpdated(tokenId, newLogicAddress);
+    function setLogicAddress(uint256 tokenId, address) external onlyTokenOwner(tokenId) {
+        require(false, "Logic is updated by the launchpad contract");
     }
 
     /**
@@ -337,36 +334,7 @@ contract AgentNFT is
     // OVERRIDES
     // ============================================
 
-    function _beforeTokenTransfer(address from, address to, uint256 tokenId, uint256 batchSize)
-        internal
-        override(ERC721Upgradeable, ERC721EnumerableUpgradeable)
-    {
-        if (isFreeMint[tokenId]) {
-            require(from == address(0) || to == address(0), "Free minted tokens are non-transferable");
-        }
-        super._beforeTokenTransfer(from, to, tokenId, batchSize);
-    }
-
-    function _burn(uint256 tokenId) internal override(ERC721Upgradeable, ERC721URIStorageUpgradeable) {
-        require(agentStates[tokenId].balance == 0, "Agent balance must be 0");
-        super._burn(tokenId);
-    }
-
-    function tokenURI(uint256 tokenId)
-        public
-        view
-        override(ERC721Upgradeable, ERC721URIStorageUpgradeable)
-        returns (string memory)
-    {
-        return super.tokenURI(tokenId);
-    }
-
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        override(ERC721Upgradeable, ERC721EnumerableUpgradeable, ERC721URIStorageUpgradeable)
-        returns (bool)
-    {
+    function supportsInterface(bytes4 interfaceId) public view override(ERC721EnumerableUpgradeable) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 
@@ -374,5 +342,39 @@ contract AgentNFT is
 
     receive() external payable {
         revert("Use fundAgent() instead");
+    }
+
+    function _exists(uint256 tokenId) internal view returns (bool) {
+        return ownerOf(tokenId) != address(0);
+    }
+
+    /// @inheritdoc IERC721Metadata
+    function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
+        ERC721URIStorageStorage storage $ = _getERC721URIStorageStorage();
+        _requireOwned(tokenId);
+
+        string memory _tokenURI = $._tokenURIs[tokenId];
+        string memory base = _baseURI();
+
+        // If there is no base URI, return the token URI.
+        if (bytes(base).length == 0) {
+            return _tokenURI;
+        }
+        // If both are set, concatenate the baseURI and tokenURI (via string.concat).
+        if (bytes(_tokenURI).length > 0) {
+            return string.concat(base, _tokenURI);
+        }
+
+        return super.tokenURI(tokenId);
+    }
+
+    /**
+     * @dev Sets `_tokenURI` as the tokenURI of `tokenId`.
+     *
+     * Emits {IERC4906-MetadataUpdate}.
+     */
+    function _setTokenURI(uint256 tokenId, string memory _tokenURI) internal virtual {
+        ERC721URIStorageStorage storage $ = _getERC721URIStorageStorage();
+        $._tokenURIs[tokenId] = _tokenURI;
     }
 }
