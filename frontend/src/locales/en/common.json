@@ -1,0 +1,192 @@
+{
+  "navigation": {
+    "backToTraders": "Back to Agents",
+    "allTraders": "All AI Agents"
+  },
+  "agent": {
+    "generation": "Generation",
+    "description": "Advanced momentum-based AI agent optimized for BSC network with intelligent risk management.",
+    "stats": {
+      "totalReturn": "Return",
+      "totalTrades": "Trades",
+      "winRate": "Win Rate",
+      "performance": "Performance"
+    }
+  },
+  "trades": {
+    "title": "Trades & Active Positions",
+    "entryPrice": "Entry Price",
+    "exitPrice": "Exit Price",
+    "currentPrice": "Current Price",
+    "positionSize": "Position Size",
+    "realizedPnL": "Realized P&L",
+    "unrealizedPnL": "Unrealized P&L",
+    "stopLoss": "Stop Loss",
+    "takeProfit": "Take Profit",
+    "verified": "Verified",
+    "activePosition": "ACTIVE POSITION",
+    "livePosition": "Live Position",
+    "long": "Long",
+    "short": "Short"
+  },
+  "ai": {
+    "title": "AI Evolution & Activity",
+    "subtitle": "Real-time learning and decision making",
+    "statusText": "AI Status: ACTIVE & LEARNING",
+    "metrics": {
+      "confidence": "Confidence",
+      "learningRate": "Learning Rate",
+      "evolution": "Evolution"
+    },
+    "activities": {
+      "evolutionCycleInitiated": {
+        "title": "Evolution Cycle Initiated",
+        "description": "Analyzing performance patterns and optimizing strategy parameters"
+      },
+      "neuralNetworkUpdate": {
+        "title": "Neural Network Update",
+        "description": "Weights updated based on recent successful trades"
+      },
+      "marketSentimentAnalysis": {
+        "title": "Market Sentiment Analysis",
+        "description": "Real-time sentiment: BULLISH on BSC DeFi tokens"
+      },
+      "riskRewardOptimization": {
+        "title": "Risk-Reward Optimization",
+        "description": "Risk-reward ratio optimized from 1:2.8 to 1:3.1"
+      },
+      "positionManagement": {
+        "title": "Position Management",
+        "description": "Trailing stop activated for BNB/USDT position"
+      },
+      "tradeExecution": {
+        "title": "Trade Execution",
+        "description": "Long position opened: BNB/USDT @ $245.67"
+      },
+      "aiConfidenceAssessment": {
+        "title": "AI Confidence Assessment",
+        "description": "High confidence level based on momentum and volatility analysis"
+      },
+      "momentumDetection": {
+        "title": "Momentum Detection",
+        "description": "Significant momentum spike detected in BNB/USDT"
+      }
+    },
+    "impact": {
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+    "status": {
+      "active": "ACTIVE",
+      "completed": "completed",
+      "monitoring": "monitoring",
+      "executed": "executed",
+      "processed": "processed"
+    }
+  },
+  "bsc": {
+    "title": "BSC Network Benefits",
+    "description": "This strategy operates on Binance Smart Chain, providing low-cost trades with fast execution times.",
+    "benefits": {
+      "lowGasFees": {
+        "title": "Low Gas Fees",
+        "description": "Average cost: $0.20 per trade"
+      },
+      "fastExecution": {
+        "title": "Fast Execution",
+        "description": "3-second confirmation times"
+      },
+      "highLiquidity": {
+        "title": "High Liquidity",
+        "description": "Access to top DEXs and CEXs"
+      }
+    }
+  },
+  "agentsPage": {
+    "title": "All AI Agents",
+    "subtitle": "Comprehensive list of all AI agents on BSC",
+    "stats": {
+      "totalStrategies": "Total Agents",
+      "profitable": "Profitable",
+      "totalTrades": "Total Trades",
+      "avgPerformance": "Avg Performance"
+    },
+    "search": "Search agents...",
+    "sortBy": {
+      "performance": "Sort by Performance",
+      "health": "Sort by Health",
+      "trades": "Sort by Trades",
+      "name": "Sort by Name"
+    },
+    "filterBy": {
+      "all": "All Agents",
+      "profitable": "Profitable Only",
+      "losing": "Losing Only",
+      "highPerformance": "High Performance"
+    },
+    "showing": "Showing {{count}} of {{total}} agents",
+    "noResults": "No agents found matching your criteria."
+  },
+  "homePage": {
+    "hero": {
+      "badge": "AI Trading Platform on BSC",
+      "title": "Build",
+      "titleHighlight": "Unstoppable & Self-learning",
+      "titleSuffix": "AI Agents",
+      "subtitle": "Create intelligent AI agents powered by machine learning. Deploy on BSC for autonomous, high-frequency operations with proven results.",
+      "startTrading": "Deploy Agent",
+      "viewAllTraders": "View All Agents",
+      "stats": {
+        "activeTraders": "Active Agents",
+        "volumeTraded": "Volume Traded",
+        "winRate": "Win Rate"
+      }
+    },
+    "features": {
+      "title": "Why Choose Phunks",
+      "subtitle": "Professional AI agent tools designed for maximum efficiency on Binance Smart Chain.",
+      "smartAI": {
+        "title": "Smart AI Algorithms",
+        "description": "Advanced machine learning models trained on BSC market data for optimal agent performance."
+      },
+      "fastExecution": {
+        "title": "Lightning Fast Execution",
+        "description": "Sub-second trade execution on BSC with minimal gas fees and maximum efficiency."
+      },
+      "secure": {
+        "title": "Secure & Audited",
+        "description": "Smart contracts audited by leading security firms with proven track record."
+      },
+      "analytics": {
+        "title": "Real-time Analytics",
+        "description": "Comprehensive dashboard with live performance metrics and detailed trade history."
+      }
+    },
+    "topPerformers": {
+      "title": "Top Performing Agents",
+      "subtitle": "Most successful AI agents on BSC",
+      "viewAll": "View All"
+    },
+    "cta": {
+      "title": "Ready to Deploy Your Agent?",
+      "subtitle": "Join thousands of users deploying AI-powered agents on BSC. Start with proven models and customize as you learn.",
+      "getStarted": "Get Started"
+    }
+  },
+  "leaderboard": {
+    "title": "Leaderboard",
+    "subtitle": "Top performing AI agents on BSC",
+    "stats": {
+      "totalAgents": "Total Agents",
+      "activeTrades": "Active Trades",
+      "totalVolume": "Total Volume",
+      "avgWinRate": "Avg Win Rate"
+    },
+    "topPerformers": "Top Performers"
+  },
+  "common": {
+    "bscNetwork": "BSC Network",
+    "return": "Return"
+  }
+}
