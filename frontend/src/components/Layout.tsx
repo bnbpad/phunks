@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Brain, Trophy, Plus, Users } from 'lucide-react'
+import { Brain, Trophy, Users } from 'lucide-react'
 import LanguageSwitcher from './LanguageSwitcher'
 import { ConnectWallet } from './ConnectWallet'
 
@@ -50,13 +50,6 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
             <div className="flex items-center gap-3">
               <LanguageSwitcher />
               <ConnectWallet />
-              <Link
-                to="/create"
-                className="flex items-center gap-2 px-4 py-2 bsc-gradient hover:opacity-90 rounded-md font-exo font-medium text-sm text-white transition-opacity"
-              >
-                <Plus className="w-4 h-4" />
-                Create Agent
-              </Link>
             </div>
           </div>
         </div>
