@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 import { useAccount, useConnectors } from 'wagmi';
 import { signMessage, writeContract, waitForTransactionReceipt } from '@wagmi/core';
 import { parseEther } from 'viem';
+import { bsc } from 'wagmi/chains';
 import * as fourMemeApi from '../api/fourMeme';
 import { ICreateToken, SuccessData, FourMemeLabel } from '../types/fourMeme';
 import { config as wagmiConfig } from '../wagmi';
@@ -153,6 +154,8 @@ export const useCreateFourMeme = (
         functionName: "createToken",
         args: [createArg as `0x${string}`, apiSignature as `0x${string}`],
         value: parseEther("0.01"), // Fixed 0.01 BNB fee
+        account: address,
+        chain: bsc, // Explicitly use BSC chain
       });
 
       console.log('Waiting for transaction confirmation...');
