@@ -1,11 +1,28 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { Activity, TrendingUp, TrendingDown, Zap, Shield, Clock, DollarSign, BarChart3, Eye, ArrowLeft } from 'lucide-react'
+import { Activity, TrendingUp, TrendingDown, Zap, Shield, Clock, DollarSign, BarChart3, Eye, ArrowLeft, Users } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import ActivityEvolutionChanges from '../components/ActivityEvolutionChanges'
+import EvolutionChangesModal from '../components/EvolutionChangesModal'
 
 const AgentDashboard = () => {
   const { id } = useParams()
   const { t } = useTranslation('common')
+  const [modalOpen, setModalOpen] = useState(false)
+  const [selectedEvolutionData, setSelectedEvolutionData] = useState<{
+    changes: any[]
+    title: string
+    time: string
+  } | null>(null)
+
+  const handleShowEvolutionChanges = (activity: any) => {
+    setSelectedEvolutionData({
+      changes: activity.evolutionChanges,
+      title: activity.title,
+      time: activity.time
+    })
+    setModalOpen(true)
+  }
 
   const agentData = {
     name: 'Alpha Strategy',
@@ -22,6 +39,7 @@ const AgentDashboard = () => {
     currentPrice: '$256.89',
     unrealizedPnL: '+4.74%',
     description: t('agent.description'),
+    image: '/avatars/avatar1.png'
   }
 
   const recentTrades = [
@@ -48,6 +66,32 @@ const AgentDashboard = () => {
     { id: 7, pair: 'MATIC/USDT', type: 'Short', entry: 0.89, exit: 0.85, pnl: 4.49, time: '5 hours ago', verified: true, status: 'closed' },
   ]
 
+  // Evolution changes data
+  const evolutionChangesData = {
+    1: [ // For activity id 1 (Evolution Cycle Initiated)
+      {
+        before: [
+          'Analyze how healthy the current portfolio is (concentration, liquidity risk, volatility, leverage if any).',
+          'Decide for EACH POSITION whether to: BUY_MORE, HOLD, PARTIAL_SELL, or CLOSE.',
+          'Optionally recommend NEW entries in tokens from the market list if there is a strong opportunity.',
+          'Respect risk tolerance and the available USDT balance. Focus on realistic, executable actions within current liquidity and volatility.'
+        ],
+        after: [
+          'Analyze how healthy the current portfolio is (concentration, liquidity risk, volatility, leverage if any).',
+          'For each existing position, decide whether to: BUY_MORE, HOLD, PARTIAL_SELL, or CLOSE, considering recent market trends and the health of each token.',
+          'Optionally recommend NEW entries in tokens from the market list if there is a strong opportunity.',
+          'Identify potential new entries from the market list, considering only those tokens that present a strong opportunity and can contribute to portfolio diversification.',
+          'Ensure that the portfolio\'s overall risk level remains within the MEDIUM risk tolerance, adjusting allocations if necessary.',
+          'Review the stop-loss and take-profit levels for each token, adjusting them based on recent price movements and volatility.',
+          'Monitor the performance of ZRX closely due to its high concentration in the portfolio and high volatility.',
+          'Consider the available USDT balance before making any new purchases, ensuring sufficient liquidity is maintained.',
+          'Focus on realistic, executable actions that consider current market liquidity and volatility.',
+          'Reflect on the outcomes of the previous decisions, learning from any successes or mistakes, and adjust the strategy accordingly.'
+        ]
+      }
+    ]
+  }
+
   const aiActivities = [
     {
       id: 1,
@@ -57,7 +101,8 @@ const AgentDashboard = () => {
       type: 'evolution',
       impact: t('ai.impact.high'),
       metrics: { winRate: '+0.3%', efficiency: '+12%' },
-      status: 'active'
+      status: 'active',
+      evolutionChanges: evolutionChangesData[1]
     },
     {
       id: 2,
@@ -87,7 +132,8 @@ const AgentDashboard = () => {
       type: 'evolution',
       impact: t('ai.impact.high'),
       metrics: { ratio: '1:3.1', improvement: '+10.7%' },
-      status: 'completed'
+      status: 'completed',
+      evolutionChanges: evolutionChangesData[4]
     },
     {
       id: 5,
@@ -146,8 +192,8 @@ const AgentDashboard = () => {
       <div className="bg-white card-shadow rounded-xl p-8">
         <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
           <div className="flex items-start gap-4">
-            <div className="w-16 h-16 rounded-xl bg-bsc-100 flex items-center justify-center">
-              <BarChart3 className="w-8 h-8 text-bsc-600" />
+            <div className="w-16 h-16 rounded-xl overflow-hidden bg-gray-100">
+              <img src={agentData.image} alt={agentData.name} className="w-full h-full object-cover" />
             </div>
             <div>
               <h1 className="text-3xl font-orbitron font-black text-gray-900">{agentData.name}</h1>
@@ -410,6 +456,14 @@ const AgentDashboard = () => {
                   ))}
                 </div>
 
+                {/* Evolution Changes - Only for evolution type activities */}
+                {activity.type === 'evolution' && activity.evolutionChanges && (
+                  <ActivityEvolutionChanges
+                    changes={activity.evolutionChanges}
+                    onShowChanges={() => handleShowEvolutionChanges(activity)}
+                  />
+                )}
+
                 {/* Status indicator */}
                 <div className="flex items-center gap-2 mt-3 text-xs">
                   <div className={`w-2 h-2 rounded-full ${
@@ -453,6 +507,17 @@ const AgentDashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* Evolution Changes Modal */}
+      {selectedEvolutionData && (
+        <EvolutionChangesModal
+          isOpen={modalOpen}
+          onClose={() => setModalOpen(false)}
+          changes={selectedEvolutionData.changes}
+          activityTitle={selectedEvolutionData.title}
+          activityTime={selectedEvolutionData.time}
+        />
+      )}
     </div>
   )
 }
