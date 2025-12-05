@@ -96,16 +96,19 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
-  code: string | number;
-  data: string; // access token
-  msg?: string;
+  code: string;
+  data: string; // access_token
 }
 
+// 3. Upload Token Image
 export interface UploadImageResponse {
-  code: string | number;
-  data: string; // image URL
-  msg?: string;
+  data: {
+    message: string;
+    code: string;
+    data: string; // uploaded image URL
+  };
 }
+
 
 export interface CreateTokenRequest {
   name: string;
@@ -131,21 +134,24 @@ export interface CreateTokenRequest {
 }
 
 export interface CreateTokenResponse {
-  code: string;
   data: {
-    tokenId: number;
-    totalAmount: string;
-    saleAmount: string;
-    template: number;
-    launchTime: number; // Unix timestamp in seconds
-    serverTime: number;
-    createArg: string; // Hex string starting with 0x
-    signature: string; // Hex string starting with 0x (65 bytes = 130 hex chars + 0x = 132 chars)
-    bamount: string;
-    tamount: string;
+    code: string;
+    message: string;
+    data: {
+      tokenId: number;
+      totalAmount: string;
+      saleAmount: string;
+      template: number;
+      launchTime: number; // Unix timestamp in seconds
+      serverTime: number;
+      createArg: string; // Hex string starting with 0x
+      signature: string; // Hex string starting with 0x (65 bytes = 130 hex chars + 0x = 132 chars)
+      bamount: string;
+      tamount: string;
+    };
   };
-  msg?: string;
 }
+
 
 export interface SaveTokenRequest extends CreateTokenRequest {
   txHash: string;
@@ -163,14 +169,14 @@ export interface SaveTokenResponse {
   error?: string;
 }
 
-export interface SuccessData {
-  trxHash: string;
-  tokenAddress: string;
-  message: string;
-  chainId: number;
-  imgUrl: string;
-  symbol: string;
-}
+export type SuccessData = {
+  trxHash?: string;
+  tokenAddress?: string;
+  message?: string;
+  chainId?: number;
+  imgUrl?: string;
+  symbol?: string;
+};
 
 export type FourMemeLabel =
   | "Meme"

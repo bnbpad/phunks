@@ -12,5 +12,5 @@ router.get("/", (_req, res) => {
 });
 
 router.use("/token", token);
-router.use("/agent", agent);
+router.use("/agents", agent);
 export default router;

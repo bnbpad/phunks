@@ -15,7 +15,6 @@ const Step1BasicDetails: React.FC<Step1BasicDetailsProps> = ({
   onDataChange,
   onImageChange,
   imageFile,
-  walletConnected
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
