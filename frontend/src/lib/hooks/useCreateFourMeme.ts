@@ -38,6 +38,7 @@ export const useCreateFourMeme = (
     onFailure: (e: string) => void,
     onEnd: () => void
   ): Promise<void> => {
+    console.log("imageFile", imageFile);
     if (!address) {
       onFailure('Please connect your wallet first');
       return;
@@ -98,24 +99,20 @@ export const useCreateFourMeme = (
       console.log('Uploading token image...');
       let imageUrl = uploadedImageUrl;
 
-      if (!imageUrl && imageFile) {
+      if (!imageUrl || imageUrl.length <= 0) {
         const uploadResponse = await fourMemeApi.uploadTokenImageFourMeme(
           imageFile,
           accessToken
         );
 
         if (!fourMemeApi.isApiSuccess(uploadResponse)) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           throw new Error((uploadResponse as any)?.msg || 'Failed to upload image');
         }
 
-        imageUrl = (uploadResponse as any)?.data || '';
+        imageUrl = uploadResponse?.data?.data as string;
+        console.log('Image uploaded:', imageUrl);
         afterImageUpload(imageUrl);
-      }
-
-      // Use default image if no image is provided
-      if (!imageUrl) {
-        imageUrl = 'https://public.bnbstatic.com/image/cms/blog/20190313/977e803b-c37e-4eb2-91fb-1a744a9bc7b6.png';
-        console.log('Using default image:', imageUrl);
       }
 
       // 4. Create Token on FourMeme
@@ -128,7 +125,7 @@ export const useCreateFourMeme = (
         launchTime: Date.now(),
         label: "Meme",
         lpTradingFee: 0.0025,
-        webUrl: "https://bnbpad.ai/",
+        webUrl: "https://phunks.ai/",
         twitterUrl: formData.links.twitterLink || "",
         telegramUrl: formData.links.telegramLink || "",
         preSale: formData.tokenomics.amountToBuy || "0",
@@ -147,17 +144,16 @@ export const useCreateFourMeme = (
         accessToken
       );
 
-      if (!fourMemeApi.isApiSuccess(createResponse)) {
-        throw new Error((createResponse as any)?.msg || 'Failed to create token');
+      if (!createResponse.data?.data) {
+        throw new Error("Failed to create token");
       }
 
-      // 5. Blockchain Transaction
-      console.log('Executing blockchain transaction...');
-      const createData = (createResponse as any)?.data;
-      if (!createData?.createArg || !createData?.signature) {
-        throw new Error('Invalid response from FourMeme API - missing transaction data');
+      // Step 5: Call Blockchain Contract
+      const { createArg, signature: apiSignature } = createResponse.data.data;
+
+      if (!createArg || !apiSignature) {
+        throw new Error("Missing createArg or signature from API response");
       }
-      const { createArg, signature: apiSignature } = createData;
 
       const trxHash = await writeContract(wagmiConfig, {
         abi: appConfig.contracts.tokenManager.abi,
@@ -169,7 +165,10 @@ export const useCreateFourMeme = (
         chain: bsc, // Explicitly use BSC chain
       });
 
-      console.log('Waiting for transaction confirmation...');
+      if (!trxHash) {
+        throw new Error("Transaction hash not found");
+      }
+
       await waitForTransactionReceipt(wagmiConfig, { hash: trxHash });
 
       // 6. Save to Backend
@@ -178,30 +177,26 @@ export const useCreateFourMeme = (
         ...createTokenRequest,
         txHash: trxHash,
         chainID: 56,
-        apiKey: formData.apiKey || "",
-        apiSecret: formData.apiSecret || "",
         aiThesis: formData.aiThesis || undefined,
       });
 
-      if (!fourMemeApi.isApiSuccess(response)) {
-        throw new Error((response as any)?.msg || 'Failed to save token');
+      if (response && !response.success) {
+        if (response.error) {
+          console.log("Error creating token:", response.error);
+          onFailure("Token creation failed" + response.error);
+        }
+        onFailure("Token creation failed without any error");
+        return;
       }
 
-      const tokenAddress = (response as any)?.data?.tokenAddress;
-      if (!tokenAddress) {
-        throw new Error('Failed to get token address from backend');
-      }
-
-      setStatus('success');
       onSuccess({
         trxHash: trxHash,
-        tokenAddress: tokenAddress,
+        tokenAddress: response.data.tokenAddress,
         message: "Token created successfully on FourMeme",
         chainId: formData.basicDetails.chainId,
         imgUrl: imageUrl,
         symbol: formData.basicDetails.symbol,
       });
-
     } catch (e) {
       console.error('Token creation error:', e);
       setStatus('error');
@@ -273,5 +268,3 @@ export const useCreateFourMeme = (
     reset
   };
 };
-
-export default useCreateFourMeme;
