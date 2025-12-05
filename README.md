@@ -13,5 +13,5 @@ The entire ecosystem is automated and decentralized, creating fully autonomous, 
 We have used the following integrations
 
 - Used ChatAndBuild to develop the wireframes frontend & backend
-- Used Deepseek for the AI model
-- Used Non-Fungible Agents (NFA) bu ChatAndBuild to organise data of the agents onchain
+- Used Anthropic for the AI model (later will move to Deepseek to further decentralize the ecosystem)
+- Used Non-Fungible Agents (NFA) by ChatAndBuild to organise data of the agents onchain
