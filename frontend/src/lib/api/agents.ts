@@ -95,9 +95,13 @@ export interface ErrorResponse {
 export const fetchAgentDetails = async (agentId: string): Promise<AgentDetailResponse> => {
   try {
     const response = await fetch(`${config.api.baseURL}/agents/${agentId}`, {
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'true',
+        'Access-Control-Allow-Origin': '*',
       },
+      mode: 'cors',
     });
 
     if (!response.ok) {
@@ -123,9 +127,13 @@ export const fetchAgentsList = async (params: AgentsListParams = {}): Promise<Ag
     });
 
     const response = await fetch(`${config.api.baseURL}/agents?${queryString}`, {
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'true',
+        'Access-Control-Allow-Origin': '*',
       },
+      mode: 'cors',
     });
 
     if (!response.ok) {
