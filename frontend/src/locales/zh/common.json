@@ -1,0 +1,192 @@
+{
+  "navigation": {
+    "backToTraders": "返回代理",
+    "allTraders": "所有AI代理"
+  },
+  "agent": {
+    "generation": "代",
+    "description": "针对BSC网络优化的高级动量AI代理，具备智能风险管理功能。",
+    "stats": {
+      "totalReturn": "收益",
+      "totalTrades": "交易",
+      "winRate": "胜率",
+      "performance": "表现"
+    }
+  },
+  "trades": {
+    "title": "交易与活跃仓位",
+    "entryPrice": "入场价格",
+    "exitPrice": "出场价格",
+    "currentPrice": "当前价格",
+    "positionSize": "仓位大小",
+    "realizedPnL": "已实现盈亏",
+    "unrealizedPnL": "未实现盈亏",
+    "stopLoss": "止损",
+    "takeProfit": "止盈",
+    "verified": "已验证",
+    "activePosition": "活跃仓位",
+    "livePosition": "实时仓位",
+    "long": "做多",
+    "short": "做空"
+  },
+  "ai": {
+    "title": "AI进化与活动",
+    "subtitle": "实时学习与决策制定",
+    "statusText": "AI状态：活跃学习中",
+    "metrics": {
+      "confidence": "信心度",
+      "learningRate": "学习率",
+      "evolution": "进化"
+    },
+    "activities": {
+      "evolutionCycleInitiated": {
+        "title": "进化周期启动",
+        "description": "分析性能模式并优化策略参数"
+      },
+      "neuralNetworkUpdate": {
+        "title": "神经网络更新",
+        "description": "基于近期成功交易更新权重"
+      },
+      "marketSentimentAnalysis": {
+        "title": "市场情绪分析",
+        "description": "实时情绪：看涨BSC DeFi代币"
+      },
+      "riskRewardOptimization": {
+        "title": "风险收益优化",
+        "description": "风险收益比从1:2.8优化至1:3.1"
+      },
+      "positionManagement": {
+        "title": "仓位管理",
+        "description": "BNB/USDT仓位激活追踪止损"
+      },
+      "tradeExecution": {
+        "title": "交易执行",
+        "description": "开启多头仓位：BNB/USDT @ $245.67"
+      },
+      "aiConfidenceAssessment": {
+        "title": "AI信心评估",
+        "description": "基于动量和波动性分析的高信心水平"
+      },
+      "momentumDetection": {
+        "title": "动量检测",
+        "description": "在BNB/USDT中检测到显著动量飙升"
+      }
+    },
+    "impact": {
+      "high": "高",
+      "medium": "中",
+      "low": "低"
+    },
+    "status": {
+      "active": "活跃",
+      "completed": "已完成",
+      "monitoring": "监控中",
+      "executed": "已执行",
+      "processed": "已处理"
+    }
+  },
+  "bsc": {
+    "title": "BSC网络优势",
+    "description": "该策略在币安智能链上运行，提供低成本交易和快速执行时间。",
+    "benefits": {
+      "lowGasFees": {
+        "title": "低Gas费",
+        "description": "平均成本：每笔交易$0.20"
+      },
+      "fastExecution": {
+        "title": "快速执行",
+        "description": "3秒确认时间"
+      },
+      "highLiquidity": {
+        "title": "高流动性",
+        "description": "接入顶级DEX和CEX"
+      }
+    }
+  },
+  "agentsPage": {
+    "title": "所有AI代理",
+    "subtitle": "BSC上所有AI代理的综合列表",
+    "stats": {
+      "totalStrategies": "总代理数",
+      "profitable": "盈利数",
+      "totalTrades": "总交易数",
+      "avgPerformance": "平均表现"
+    },
+    "search": "搜索代理...",
+    "sortBy": {
+      "performance": "按表现排序",
+      "health": "按健康度排序",
+      "trades": "按交易量排序",
+      "name": "按名称排序"
+    },
+    "filterBy": {
+      "all": "所有代理",
+      "profitable": "仅盈利",
+      "losing": "仅亏损",
+      "highPerformance": "高性能"
+    },
+    "showing": "显示 {{count}} / {{total}} 代理",
+    "noResults": "未找到符合条件的交易员。"
+  },
+  "homePage": {
+    "hero": {
+      "badge": "BSC上的AI交易平台",
+      "title": "构建",
+      "titleHighlight": "无敌且自学习的",
+      "titleSuffix": "AI代理",
+      "subtitle": "创建AI代理，由机器学习驱动。部署在BSC上，实现自主、高频操作和经过验证的结果。",
+      "startTrading": "部署代理",
+      "viewAllTraders": "查看所有代理",
+      "stats": {
+        "activeTraders": "活跃代理",
+        "volumeTraded": "交易量",
+        "winRate": "胜率"
+      }
+    },
+    "features": {
+      "title": "为什么选择Phunks",
+      "subtitle": "专为币安智能链最大效率而设计的专业AI代理工具。",
+      "smartAI": {
+        "title": "智能AI模型",
+        "description": "基于BSC市场数据训练的高级机器学习模型，实现最佳代理性能。"
+      },
+      "fastExecution": {
+        "title": "闪电般快速执行",
+        "description": "在BSC上实现亚秒级交易执行，gas费用最低，效率最高。"
+      },
+      "secure": {
+        "title": "安全可信",
+        "description": "智能合约经过领先安全公司审计，拥有可靠的往绩记录。"
+      },
+      "analytics": {
+        "title": "实时分析",
+        "description": "综合仪表板，提供实时性能指标和详细交易历史。"
+      }
+    },
+    "topPerformers": {
+      "title": "顶级表现代理",
+      "subtitle": "BSC上最成功的AI代理",
+      "viewAll": "查看全部"
+    },
+    "cta": {
+      "title": "准备部署您的代理吗？",
+      "subtitle": "加入数千名在BSC上部署AI代理的用户。从经过验证的模型开始，随着学习进行个性化定制。",
+      "getStarted": "开始使用"
+    }
+  },
+  "leaderboard": {
+    "title": "排行榜",
+    "subtitle": "BSC上表现最佳的AI代理",
+    "stats": {
+      "totalAgents": "总代理数",
+      "activeTrades": "活跃交易",
+      "totalVolume": "总交易量",
+      "avgWinRate": "平均胜率"
+    },
+    "topPerformers": "顶级表现者"
+  },
+  "common": {
+    "bscNetwork": "BSC网络",
+    "return": "收益"
+  }
+}
