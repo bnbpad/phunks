@@ -37,6 +37,9 @@ contract DeployScript is Script {
             "I am a trader"
         );
 
+        agentLaunchpad.sendRequest(address(0xe29315aF2cC7e4D69c50A962829B2C122ce94444), 1);
+        agentLaunchpad.sendRequest(address(0xe29315aF2cC7e4D69c50A962829B2C122ce94444), 0);
+
         vm.stopBroadcast();
     }
 }
