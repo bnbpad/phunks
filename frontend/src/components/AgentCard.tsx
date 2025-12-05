@@ -1,5 +1,4 @@
 import React from 'react'
-import { Activity, TrendingUp, Shield, Zap } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
@@ -14,10 +13,8 @@ interface AgentCardProps {
   image: string
 }
 
-const AgentCard = ({ id, name, symbol, pnl, health, evolution, trades, image }: AgentCardProps) => {
+const AgentCard = ({ id, name, symbol, evolution, image }: AgentCardProps) => {
   const { t } = useTranslation('common')
-  const pnlColor = pnl >= 0 ? 'text-green-400' : 'text-red-400'
-  const healthColor = health >= 70 ? 'bg-green-400' : health >= 40 ? 'bg-yellow-400' : 'bg-red-400'
 
   return (
     <Link to={`/agent/${id}`}>

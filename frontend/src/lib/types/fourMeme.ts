@@ -1,4 +1,4 @@
-// FourMeme Token Creation Types
+// FourMeme Token Creation Typee
 
 export interface ICreateToken {
   selectedDexId: "fourmeme";
@@ -96,20 +96,19 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
-  code: string | number;
-  data: string; // access token
-  msg?: string;
+  code: string;
+  data: string; // access_token
 }
 
+// 3. Upload Token Image
 export interface UploadImageResponse {
-  code?: string | number;
   data: {
-    message?: string;
-    code?: string;
-    data: string; // image URL
+    message: string;
+    code: string;
+    data: string; // uploaded image URL
   };
-  msg?: string;
 }
+
 
 export interface CreateTokenRequest {
   name: string;
@@ -153,6 +152,7 @@ export interface CreateTokenResponse {
   };
 }
 
+
 export interface SaveTokenRequest extends CreateTokenRequest {
   txHash: string;
   chainID: 56; // BSC
@@ -169,14 +169,14 @@ export interface SaveTokenResponse {
   error?: string;
 }
 
-export interface SuccessData {
-  trxHash: string;
-  tokenAddress: string;
-  message: string;
-  chainId: number;
-  imgUrl: string;
-  symbol: string;
-}
+export type SuccessData = {
+  trxHash?: string;
+  tokenAddress?: string;
+  message?: string;
+  chainId?: number;
+  imgUrl?: string;
+  symbol?: string;
+};
 
 export type FourMemeLabel =
   | "Meme"

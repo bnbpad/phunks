@@ -9,6 +9,8 @@ import { router } from "./routes";
 import nconf from "./config/nconf";
 import { errorHandler } from "./middlewares/errorHandler";
 
+import "./controllers/runner";
+
 const app = express();
 const server = new http.Server(app);
 export const io = new Server(server, {
