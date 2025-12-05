@@ -52,8 +52,9 @@ contract AgentLaunchpad is Initializable, OwnableUpgradeable {
     event AgentActionUpgrade(bytes32 indexed hash, address indexed agentAddress, string _memory);
     event AgentCreated(uint256 indexed tokenId, address indexed owner, address logicAddress, string metadataURI);
 
-    function initialize(address _owner) public initializer {
+    function initialize(address _owner, address _agentNFT) public initializer {
         __Ownable_init(_owner);
+        agentNFT = _agentNFT;
     }
 
     function setAVS(address _avs) public onlyOwner {
