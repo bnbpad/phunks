@@ -12,9 +12,6 @@ router.get("/:id", async (req, res) => {
 });
 
 router.get("/", async (req, res) => {
-  const { chainId } = req.query as {
-    chainId: string;
-  };
   const data = await getAllAgents();
   res.json({ success: true, data });
 });
