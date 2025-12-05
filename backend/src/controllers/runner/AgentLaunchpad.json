@@ -205,6 +205,25 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "getPendingTxs",
+    "outputs": [
+      { "internalType": "bytes32[]", "name": "", "type": "bytes32[]" },
+      {
+        "components": [
+          { "internalType": "address", "name": "agent", "type": "address" },
+          { "internalType": "uint256", "name": "status", "type": "uint256" },
+          { "internalType": "uint256", "name": "actionId", "type": "uint256" }
+        ],
+        "internalType": "struct AgentLaunchpad.AgentRequest[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
     "name": "goals",
     "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
@@ -247,7 +266,8 @@
     "name": "requests",
     "outputs": [
       { "internalType": "address", "name": "agent", "type": "address" },
-      { "internalType": "uint256", "name": "status", "type": "uint256" }
+      { "internalType": "uint256", "name": "status", "type": "uint256" },
+      { "internalType": "uint256", "name": "actionId", "type": "uint256" }
     ],
     "stateMutability": "view",
     "type": "function"
