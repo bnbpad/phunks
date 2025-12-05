@@ -319,7 +319,7 @@ const Traders = () => {
               onChange={(e) => setSortBy(e.target.value)}
               className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:border-bsc-500 focus:outline-none font-exo appearance-none"
             >
-              <option value="performance">{t('agentsPage.sortBy.performance')}</option>
+              <option value="pnl">{t('agentsPage.sortBy.performance')}</option>
               <option value="health">{t('agentsPage.sortBy.health')}</option>
               <option value="trades">{t('agentsPage.sortBy.trades')}</option>
               <option value="name">{t('agentsPage.sortBy.name')}</option>

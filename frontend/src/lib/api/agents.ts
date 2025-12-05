@@ -109,7 +109,9 @@ export const fetchAgentDetails = async (agentId: string): Promise<AgentDetailRes
       throw new Error(`API Error: ${errorData.error.message}`);
     }
 
-    return await response.json();
+    const jsonData = await response.json();
+    // API returns data wrapped in a 'data' property
+    return jsonData.data || jsonData;
   } catch (error) {
     console.error('Error fetching agent details:', error);
     throw error;
@@ -126,7 +128,12 @@ export const fetchAgentsList = async (params: AgentsListParams = {}): Promise<Ag
       ...(params.search && { search: params.search })
     });
 
-    const response = await fetch(`${config.api.baseURL}/agents?${queryString}`, {
+    const fullUrl = `${config.api.baseURL}/agents?${queryString}`;
+    console.log('🚀 Making API call to:', fullUrl);
+    console.log('📝 Request params:', params);
+    console.log('🔗 Query string:', queryString.toString());
+
+    const response = await fetch(fullUrl, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -136,14 +143,60 @@ export const fetchAgentsList = async (params: AgentsListParams = {}): Promise<Ag
       mode: 'cors',
     });
 
+    console.log('📡 Response status:', response.status);
+    console.log('📡 Response ok:', response.ok);
+    console.log('📡 Response headers:', Object.fromEntries(response.headers.entries()));
+
     if (!response.ok) {
-      const errorData: ErrorResponse = await response.json();
-      throw new Error(`API Error: ${errorData.error.message}`);
+      console.error('❌ Response not ok, attempting to parse error');
+      const errorText = await response.text();
+      console.error('❌ Raw error response:', errorText);
+
+      try {
+        const errorData: ErrorResponse = JSON.parse(errorText);
+        throw new Error(`API Error: ${errorData.error.message}`);
+      } catch (parseError) {
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
     }
 
-    return await response.json();
+    const rawData = await response.text();
+    console.log('📦 Raw response data:', rawData);
+
+    try {
+      const jsonData = JSON.parse(rawData);
+      console.log('✅ Parsed JSON data:', jsonData);
+
+      // API returns data wrapped in a 'data' property
+      const responseData = jsonData.data || jsonData;
+      console.log('👥 Agents array:', responseData.agents);
+      console.log('📊 Pagination info:', responseData.pagination);
+
+      // Return the unwrapped data structure
+      return {
+        agents: responseData.agents || [],
+        pagination: responseData.pagination || {
+          currentPage: 1,
+          totalPages: 1,
+          totalAgents: responseData.agents?.length || 0,
+          limit: 20,
+          hasNext: false,
+          hasPrev: false
+        }
+      };
+    } catch (parseError) {
+      console.error('❌ Failed to parse JSON:', parseError);
+      console.error('📦 Raw response was:', rawData);
+      throw new Error('Invalid JSON response from API');
+    }
+
   } catch (error) {
-    console.error('Error fetching agents list:', error);
+    console.error('💥 Complete error in fetchAgentsList:', error);
+    console.error('🔍 Error details:', {
+      name: error.name,
+      message: error.message,
+      stack: error.stack
+    });
     throw error;
   }
 };
