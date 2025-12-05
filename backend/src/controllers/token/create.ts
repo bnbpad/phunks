@@ -1,4 +1,4 @@
-import { AiThesisModel, IAiThesisPayload } from "../../database/aiThesis";
+import { AIThesisModel, IAIThesis } from "../../database/aiThesis";
 import { IToken, Tokens } from "../../database/token";
 import { ICreateFourMemeToken, ICreateToken } from "./types";
 import { CHAIN_CONFIG, ChainID } from "../../utils/constant";
@@ -97,7 +97,7 @@ export const createToken = async (
     pool,
   });
 
-  await AiThesisModel.create({
+  await AIThesisModel.create({
     ...aiThesis,
     tokenAddress: normalizedTokenAddress,
     chainId: basicDetails.chainId,
@@ -140,7 +140,7 @@ export const saveFourMemeToken = async (
     chainId?: number;
     apiKey?: string;
     apiSecret?: string;
-    aiThesis?: IAiThesisPayload;
+    aiThesis?: IAIThesis;
   }
 ) => {
   try {
@@ -226,7 +226,7 @@ export const saveFourMemeToken = async (
     const newToken = await Tokens.create(tokenData);
 
     if (body.aiThesis) {
-      await AiThesisModel.create({
+      await AIThesisModel.create({
         ...body.aiThesis,
         tokenAddress: tokenAddress.toLowerCase(),
         chainId: chainId,

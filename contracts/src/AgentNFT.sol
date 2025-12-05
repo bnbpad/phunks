@@ -140,23 +140,23 @@ contract AgentNFT is ERC721EnumerableUpgradeable, OwnableUpgradeable, UUPSUpgrad
         uint256 freeMintsRemaining =
             totalFreeMints > freeMintsClaimed[msg.sender] ? totalFreeMints - freeMintsClaimed[msg.sender] : 0;
 
-        if (freeMintsRemaining > 0) {
-            require(to == msg.sender, "Free mints can only be minted to self");
-            isFreeMint[_tokenIdCounter + 1] = true;
-            freeMintsClaimed[msg.sender]++;
-        } else {
-            // Require payment
-            require(msg.value == MINT_FEE, "Incorrect fee");
-            // Validate and send fee to treasury
-            require(treasuryAddress != address(0), "Treasury not set");
-            (bool success,) = payable(treasuryAddress).call{value: msg.value}("");
-            require(success, "Treasury transfer failed");
-        }
+        // if (freeMintsRemaining > 0) {
+        //     require(to == msg.sender, "Free mints can only be minted to self");
+        //     isFreeMint[_tokenIdCounter + 1] = true;
+        //     freeMintsClaimed[msg.sender]++;
+        // } else {
+        //     // Require payment
+        //     require(msg.value == MINT_FEE, "Incorrect fee");
+        //     // Validate and send fee to treasury
+        //     require(treasuryAddress != address(0), "Treasury not set");
+        //     (bool success,) = payable(treasuryAddress).call{value: msg.value}("");
+        //     require(success, "Treasury transfer failed");
+        // }
 
         // Mint NFT
         uint256 tokenId = ++_tokenIdCounter;
         _safeMint(to, tokenId);
-        // _setTokenURI(tokenId, metadataURI);
+        _setTokenURI(tokenId, metadataURI);
 
         // Initialize agent state
         agentStates[tokenId] =

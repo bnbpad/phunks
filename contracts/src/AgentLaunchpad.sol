@@ -38,6 +38,7 @@ contract AgentLaunchpad is Initializable, OwnableUpgradeable {
         string brainMemory;
     }
 
+    address public avs;
     mapping(bytes32 => AgentRequest) public requests;
     mapping(bytes32 => string) public goals;
     mapping(bytes32 => string) public memories;
@@ -51,8 +52,13 @@ contract AgentLaunchpad is Initializable, OwnableUpgradeable {
     event AgentActionUpgrade(bytes32 indexed hash, address indexed agentAddress, string _memory);
     event AgentCreated(uint256 indexed tokenId, address indexed owner, address logicAddress, string metadataURI);
 
-    function initialize(address _owner) public initializer {
+    function initialize(address _owner, address _agentNFT) public initializer {
         __Ownable_init(_owner);
+        agentNFT = _agentNFT;
+    }
+
+    function setAVS(address _avs) public onlyOwner {
+        avs = _avs;
     }
 
     function createAgent(
@@ -81,13 +87,15 @@ contract AgentLaunchpad is Initializable, OwnableUpgradeable {
 
     function respondWithAction(bytes32 hash, address to, bytes memory data, uint256 value) public {
         require(requests[hash].status == 1, "Request not found");
+        require(msg.sender == avs, "Not authorized");
         requests[hash].status = 2;
-        Agent(requests[hash].agent).executeAction(to, data, value);
+        Agent(payable(requests[hash].agent)).executeAction(to, data, value);
         emit AgentActionResponse(hash, requests[hash].agent, data, to, value);
     }
 
     function respondWithUpgrade(bytes32 hash, string memory _memory) public {
         require(requests[hash].status == 1, "Request not found");
+        require(msg.sender == avs, "Not authorized");
         requests[hash].status = 2;
         memories[hash] = _memory;
         emit AgentActionUpgrade(hash, requests[hash].agent, _memory);

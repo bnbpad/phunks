@@ -1,24 +1,15 @@
 import mongoose, { Document, Model, Schema } from "mongoose";
 
-export type AiThesisCore = {
+export type IAIThesis = {
+  tokenAddress: string;
+  chainId: number;
   goals: string;
   memory: string;
   persona: string;
   experience: string;
 };
 
-export interface IAiThesis extends AiThesisCore {
-  tokenAddress: string;
-  chainId: number;
-  createdAt?: string;
-  updatedAt?: string;
-}
-
-export type IAiThesisPayload = AiThesisCore;
-
-export interface IAiThesisDocument extends IAiThesis, Document {}
-
-const AiThesisSchema: Schema = new Schema(
+const AIThesisSchema: Schema = new Schema(
   {
     tokenAddress: { type: String, required: true, lowercase: true, trim: true },
     chainId: { type: Number, required: true },
@@ -30,7 +21,8 @@ const AiThesisSchema: Schema = new Schema(
   { timestamps: true }
 );
 
-AiThesisSchema.index({ tokenAddress: 1 }, { unique: true });
+AIThesisSchema.index({ tokenAddress: 1 }, { unique: true });
 
-export const AiThesisModel: Model<IAiThesisDocument> =
-  mongoose.model<IAiThesisDocument>("AiThesis", AiThesisSchema);
+export type IAIThesisDocument = IAIThesis & Document;
+export const AIThesisModel: Model<IAIThesisDocument> =
+  mongoose.model<IAIThesisDocument>("AIThesis", AIThesisSchema);

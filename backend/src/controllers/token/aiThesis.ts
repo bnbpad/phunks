@@ -1,19 +1,22 @@
-import { AiThesisModel } from '../../database/aiThesis';
-import { BadRequestError, NotFoundError } from '../../errors';
+import { AIThesisModel } from "../../database/aiThesis";
+import { BadRequestError, NotFoundError } from "../../errors";
 
-export const downloadAiThesis = async (tokenAddress: string, chainId: string) => {
+export const downloadAiThesis = async (
+  tokenAddress: string,
+  chainId: string
+) => {
   if (!tokenAddress || !chainId) {
-    throw new BadRequestError('tokenAddress and chainId are required');
+    throw new BadRequestError("tokenAddress and chainId are required");
   }
 
   const normalizedAddress = tokenAddress.toLowerCase();
   const numericChainId = Number(chainId);
 
   if (Number.isNaN(numericChainId)) {
-    throw new BadRequestError('chainId must be a number');
+    throw new BadRequestError("chainId must be a number");
   }
 
-  const aiThesisDocument = await AiThesisModel.findOne({
+  const aiThesisDocument = await AIThesisModel.findOne({
     tokenAddress: normalizedAddress,
     chainId: numericChainId,
   })
@@ -21,7 +24,7 @@ export const downloadAiThesis = async (tokenAddress: string, chainId: string) =>
     .exec();
 
   if (!aiThesisDocument) {
-    throw new NotFoundError('AI thesis not found for the provided token');
+    throw new NotFoundError("AI thesis not found for the provided token");
   }
   const { _id, __v, ...cleanedDoc } = aiThesisDocument;
 
