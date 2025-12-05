@@ -39,8 +39,11 @@ const AgentCard = ({ id, name, symbol, pnl, health, evolution, trades, image }: 
             <p className="text-sm text-gray-600 font-exo">{symbol}</p>
           </div>
 
-          {/* Stats */}
+          {/* TODO: Remove return, trades and performance stats later */}
+          {/*
+          Stats
           <div className="grid grid-cols-2 gap-3">
+            TODO: Remove return stat
             <div className="bg-gray-50 rounded-lg p-3">
               <div className="flex items-center gap-2 mb-1">
                 <TrendingUp className="w-4 h-4 text-gray-400" />
@@ -51,6 +54,7 @@ const AgentCard = ({ id, name, symbol, pnl, health, evolution, trades, image }: 
               </p>
             </div>
 
+            TODO: Remove trades stat
             <div className="bg-gray-50 rounded-lg p-3">
               <div className="flex items-center gap-2 mb-1">
                 <Zap className="w-4 h-4 text-gray-400" />
@@ -60,7 +64,8 @@ const AgentCard = ({ id, name, symbol, pnl, health, evolution, trades, image }: 
             </div>
           </div>
 
-          {/* Performance Bar */}
+          TODO: Remove performance bar
+          Performance Bar
           <div>
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
@@ -76,6 +81,7 @@ const AgentCard = ({ id, name, symbol, pnl, health, evolution, trades, image }: 
               ></div>
             </div>
           </div>
+          */}
 
           {/* BSC Badge */}
           <div className="flex items-center gap-2 text-xs text-bsc-600">

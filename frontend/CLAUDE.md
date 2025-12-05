@@ -138,6 +138,23 @@ This is a hackathon-quality AI agent platform that emphasizes professionalism, B
 - Keep commits focused and atomic
 - When asked to commit, create a clean commit without any automated co-author tags
 
+### TODO Code Protection
+- **NEVER remove or uncomment TODO-tagged code sections without explicit permission**
+- TODO-tagged code is intentionally commented out for future use
+- These sections contain important functionality that may be restored later
+- Always ask for explicit permission before modifying or removing TODO-tagged sections
+- Examples of TODO-tagged code:
+  ```tsx
+  // TODO: Add back other AI activity types later
+  /*
+  {
+    id: 2,
+    // ... commented code
+  }
+  */
+  ```
+- Respect the developer's intention to temporarily disable features
+
 ### Commit Message Format
 ```bash
 git commit -m "Brief description of changes
