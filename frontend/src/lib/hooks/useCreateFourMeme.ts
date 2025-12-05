@@ -4,7 +4,7 @@ import { signMessage, writeContract, waitForTransactionReceipt } from '@wagmi/co
 import { parseEther } from 'viem';
 import { bsc } from 'wagmi/chains';
 import * as fourMemeApi from '../api/fourMeme';
-import { ICreateToken, SuccessData, FourMemeLabel } from '../types/fourMeme';
+import { ICreateToken, SuccessData } from '../types/fourMeme';
 import { config as wagmiConfig } from '../wagmi';
 import appConfig from '../config';
 
@@ -23,7 +23,6 @@ export const useCreateFourMeme = (
   formData: ICreateToken,
   imageFile: File | undefined,
   uploadedImageUrl: string,
-  label: FourMemeLabel = "Meme"
 ) => {
   const { address } = useAccount();
   const connectors = useConnectors();
@@ -188,10 +187,44 @@ export const useCreateFourMeme = (
         return;
       }
 
+      // 7. Create AI Agent if AI thesis is provided
+      let agentMessage = "Token created successfully on FourMeme";
+      if (formData.aiThesis && formData.aiThesis.goals && formData.aiThesis.memory &&
+          formData.aiThesis.persona && formData.aiThesis.experience) {
+
+        console.log('Creating AI Agent on launchpad...');
+        try {
+          const agentTrxHash = await writeContract(wagmiConfig, {
+            abi: appConfig.contracts.agentLaunchpad.abi,
+            address: appConfig.contracts.agentLaunchpad.address as `0x${string}`,
+            functionName: "createAgent",
+            args: [
+              response.data.tokenAddress as `0x${string}`, // fourToken
+              formData.aiThesis.goals,                     // goal
+              formData.aiThesis.memory,                    // brainMemory
+              formData.aiThesis.persona,                   // persona
+              formData.aiThesis.experience                 // experience
+            ],
+            account: address,
+            chain: bsc,
+          });
+
+          if (agentTrxHash) {
+            await waitForTransactionReceipt(wagmiConfig, { hash: agentTrxHash });
+            agentMessage = "Token and AI Agent created successfully!";
+            console.log('AI Agent created with txHash:', agentTrxHash);
+          }
+        } catch (agentError) {
+          console.error('Agent creation error:', agentError);
+          // Don't fail the entire flow if agent creation fails, just update message
+          agentMessage = "Token created successfully, but AI Agent creation failed";
+        }
+      }
+
       onSuccess({
         trxHash: trxHash,
         tokenAddress: response.data.tokenAddress,
-        message: "Token created successfully on FourMeme",
+        message: agentMessage,
         chainId: formData.basicDetails.chainId,
         imgUrl: imageUrl,
         symbol: formData.basicDetails.symbol,

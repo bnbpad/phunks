@@ -1,4 +1,5 @@
 import TokenManagerABI from './abi/TokenManagerV2.json';
+import AgentLaunchpadABI from './abi/AgentLaunchpad.json';
 
 // Application Configuration
 export const config = {
@@ -25,6 +26,10 @@ export const config = {
     tokenManager: {
       address: '0x5c952063c7fc8610FFDB798152D69F0B9550762b',
       abi: TokenManagerABI
+    },
+    agentLaunchpad: {
+      address: '0x209f28b4E3bca2528839f3D9C349262828738454',
+      abi: AgentLaunchpadABI
     },
     agentNFT: '0x742d35Cc6634C0532925a3b8D91d99e2c4b851E8',
     // Token addresses

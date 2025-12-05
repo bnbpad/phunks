@@ -119,22 +119,31 @@ const Step3AIThesis: React.FC<Step3AIThesisProps> = ({
         })}
       </div>
 
-      {/* Info Panel */}
+      {/* Agent Creation Info */}
       <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg p-6 border border-purple-200">
         <h4 className="font-orbitron font-bold text-gray-900 mb-3">
-          🤖 AI Agent Capabilities
+          🤖 AI Agent Creation
         </h4>
+        <p className="text-sm text-gray-700 font-exo mb-4">
+          <strong>Complete all fields above to automatically create an AI Agent linked to your token!</strong>
+        </p>
         <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-700 font-exo">
           <div className="space-y-2">
-            <p>• <strong>Intelligent Decision Making:</strong> Uses configured goals and experience</p>
-            <p>• <strong>Contextual Memory:</strong> Learns from past interactions and patterns</p>
-            <p>• <strong>Personality-Driven:</strong> Consistent behavior based on defined persona</p>
+            <p>• <strong>Agent Launchpad Integration:</strong> Deploys on-chain AI agent</p>
+            <p>• <strong>Token-Linked Agent:</strong> Agent tied to your FourMeme token</p>
+            <p>• <strong>Smart Contract Deployment:</strong> Permanent blockchain record</p>
           </div>
           <div className="space-y-2">
-            <p>• <strong>Goal-Oriented:</strong> Actions aligned with defined objectives</p>
-            <p>• <strong>Adaptive Learning:</strong> Evolves based on experience and feedback</p>
-            <p>• <strong>Custom Expertise:</strong> Specialized knowledge in configured domains</p>
+            <p>• <strong>Goal-Oriented Behavior:</strong> Actions aligned with defined objectives</p>
+            <p>• <strong>Memory & Learning:</strong> Contextual understanding and evolution</p>
+            <p>• <strong>Personalized Trading:</strong> Custom expertise and personality</p>
           </div>
+        </div>
+        <div className="mt-4 p-3 bg-white rounded-lg border border-purple-200">
+          <p className="text-xs text-purple-700 font-exo">
+            <strong>Note:</strong> If you skip this step, only your FourMeme token will be created.
+            Complete all AI fields to also deploy your AI agent to the Agent Launchpad.
+          </p>
         </div>
       </div>
     </div>
