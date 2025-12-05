@@ -92,11 +92,12 @@ contract AgentLaunchpad is Initializable, OwnableUpgradeable {
     }
 
     function sendRequest(address agent, uint256 actionId) public {
-        require(isAgent[agent], "Agent not found");
-        bytes32 hash = keccak256(abi.encode(agent, actionId, block.timestamp));
-        requests[hash] = AgentRequest(agent, 1, actionId);
+        require(tokenToAgent[agent] != address(0), "Agent not found");
+        address token = tokenToAgent[agent];
+        bytes32 hash = keccak256(abi.encode(token, actionId, block.timestamp));
+        requests[hash] = AgentRequest(token, 1, actionId);
         _pendingTxs.add(hash);
-        emit AgentActionRequest(hash, agent, actionId);
+        emit AgentActionRequest(hash, token, actionId);
     }
 
     function getPendingTxs() public view returns (bytes32[] memory, AgentRequest[] memory) {

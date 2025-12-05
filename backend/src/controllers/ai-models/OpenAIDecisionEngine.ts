@@ -1,5 +1,5 @@
-import axios, { AxiosInstance } from 'axios';
-import nconf from 'nconf';
+import axios, { AxiosInstance } from "axios";
+import nconf from "nconf";
 
 export interface MarketAnalysis {
   token: string;
@@ -9,7 +9,7 @@ export interface MarketAnalysis {
   priceChange24h: number;
   volatility: number;
   liquidity: number;
-  sentiment: 'bullish' | 'bearish' | 'neutral';
+  sentiment: "bullish" | "bearish" | "neutral";
   technicalIndicators: {
     rsi: number;
     macd: number;
@@ -19,10 +19,10 @@ export interface MarketAnalysis {
 }
 
 export interface TradingDecision {
-  action: 'BUY' | 'SELL' | 'HOLD';
+  action: "BUY" | "SELL" | "HOLD";
   confidence: number; // 0-100
   reasoning: string;
-  riskLevel: 'LOW' | 'MEDIUM' | 'HIGH';
+  riskLevel: "LOW" | "MEDIUM" | "HIGH";
   positionSize: number; // 0-1 (percentage of available balance)
   stopLoss?: number;
   takeProfit?: number;
@@ -71,26 +71,26 @@ export class OpenAIDecisionEngine {
   private prompts: AIPrompt;
 
   constructor(apiKey?: string, model?: string, prompts?: AIPrompt) {
-    this.apiKey = apiKey || nconf.get('OPENAI_API_KEY');
-    this.model = model || 'gpt-4';
+    this.apiKey = apiKey || nconf.get("OPENAI_API_KEY");
+    this.model = model || "gpt-4";
     this.prompts = prompts || {
       market_analysis:
-        'Analyze the current market conditions for {token} and provide a trading recommendation. Consider: 1) Technical indicators, 2) Market sentiment, 3) Volume analysis, 4) Risk assessment. Respond with: BUY, SELL, or HOLD and provide reasoning.',
+        "Analyze the current market conditions for {token} and provide a trading recommendation. Consider: 1) Technical indicators, 2) Market sentiment, 3) Volume analysis, 4) Risk assessment. Respond with: BUY, SELL, or HOLD and provide reasoning.",
       risk_assessment:
-        'Assess the risk level for trading {token} at current market conditions. Consider volatility, liquidity, and market trends. Rate risk as: LOW, MEDIUM, or HIGH with detailed reasoning.',
+        "Assess the risk level for trading {token} at current market conditions. Consider volatility, liquidity, and market trends. Rate risk as: LOW, MEDIUM, or HIGH with detailed reasoning.",
       position_sizing:
-        'Determine the optimal position size for {token} based on current market conditions and risk tolerance. Consider account balance, volatility, and market sentiment.',
+        "Determine the optimal position size for {token} based on current market conditions and risk tolerance. Consider account balance, volatility, and market sentiment.",
     };
 
     if (!this.apiKey) {
-      throw new Error('OpenAI API key is required');
+      throw new Error("OpenAI API key is required");
     }
 
     this.client = axios.create({
-      baseURL: 'https://api.openai.com/v1',
+      baseURL: "https://api.openai.com/v1",
       headers: {
         Authorization: `Bearer ${this.apiKey}`,
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       timeout: 30000,
     });
@@ -99,14 +99,16 @@ export class OpenAIDecisionEngine {
   /**
    * Analyze market data and make trading decision
    */
-  async analyzeMarketAndDecide(marketData: MarketAnalysis): Promise<TradingDecision> {
+  async analyzeMarketAndDecide(
+    marketData: MarketAnalysis
+  ): Promise<TradingDecision> {
     try {
       const prompt = this.buildMarketAnalysisPrompt(marketData);
       const response = await this.callOpenAI(prompt);
 
       return this.parseTradingDecision(response, marketData);
     } catch (error) {
-      console.error('Error in market analysis:', error);
+      console.error("Error in market analysis:", error);
       return this.getDefaultDecision(marketData);
     }
   }
@@ -118,7 +120,7 @@ export class OpenAIDecisionEngine {
     marketData: MarketAnalysis,
     proposedAction: string
   ): Promise<{
-    riskLevel: 'LOW' | 'MEDIUM' | 'HIGH';
+    riskLevel: "LOW" | "MEDIUM" | "HIGH";
     reasoning: string;
     riskFactors: string[];
   }> {
@@ -128,11 +130,11 @@ export class OpenAIDecisionEngine {
 
       return this.parseRiskAssessment(response);
     } catch (error) {
-      console.error('Error in risk assessment:', error);
+      console.error("Error in risk assessment:", error);
       return {
-        riskLevel: 'MEDIUM',
-        reasoning: 'Unable to assess risk due to API error',
-        riskFactors: ['API_ERROR'],
+        riskLevel: "MEDIUM",
+        reasoning: "Unable to assess risk due to API error",
+        riskFactors: ["API_ERROR"],
       };
     }
   }
@@ -143,7 +145,7 @@ export class OpenAIDecisionEngine {
   async determinePositionSize(
     marketData: MarketAnalysis,
     balanceInput: Balance[],
-    riskTolerance: 'LOW' | 'MEDIUM' | 'HIGH'
+    riskTolerance: "LOW" | "MEDIUM" | "HIGH"
   ): Promise<{
     positionSize: number;
     reasoning: string;
@@ -162,54 +164,14 @@ export class OpenAIDecisionEngine {
       const response = await this.callOpenAI(prompt);
       return this.parsePositionSizing(response);
     } catch (error) {
-      console.error('Error in position sizing:', error);
+      console.error("Error in position sizing:", error);
       return {
         positionSize: 0.1, // Default 10%
-        reasoning: 'Using default position size due to API error',
+        reasoning: "Using default position size due to API error",
         maxLoss: availableBalanceValue * 0.1,
       };
     }
   }
-
-  // /**
-  //  * Get comprehensive trading recommendation
-  //  */
-  // async getTradingRecommendation(
-  //   marketData: MarketAnalysis,
-  //   availableBalance: number,
-  //   riskTolerance: 'LOW' | 'MEDIUM' | 'HIGH'
-  // ): Promise<TradingDecision> {
-  //   try {
-  //     // Get market analysis
-  //     const analysis = await this.analyzeMarketAndDecide(marketData);
-
-  //     // Assess risk
-  //     const riskAssessment = await this.assessRisk(marketData, analysis.action);
-
-  //     // Determine position size
-  //     const positionSizing = await this.determinePositionSize(
-  //       marketData,
-  //       availableBalance,
-  //       riskTolerance
-  //     );
-
-  //     // Combine all information
-  //     return {
-  //       action: analysis.action,
-  //       confidence: analysis.confidence,
-  //       reasoning: `${analysis.reasoning}\n\nRisk Assessment: ${riskAssessment.reasoning}\nPosition Sizing: ${positionSizing.reasoning}`,
-  //       riskLevel: riskAssessment.riskLevel,
-  //       positionSize: positionSizing.positionSize,
-  //       stopLoss: this.calculateStopLoss(marketData.price, riskAssessment.riskLevel),
-  //       takeProfit: this.calculateTakeProfit(marketData.price, riskAssessment.riskLevel),
-  //       marketConditions: this.identifyMarketConditions(marketData),
-  //       selectedToken: marketData,
-  //     };
-  //   } catch (error) {
-  //     console.error('Error getting trading recommendation:', error);
-  //     return this.getDefaultDecision(marketData);
-  //   }
-  // }
 
   /**
    * Get best trading recommendation from multiple tokens
@@ -219,15 +181,17 @@ export class OpenAIDecisionEngine {
     marketDataArray: MarketAnalysis[],
     balance: Balance[],
     agentPositions: Position[],
-    riskTolerance: 'LOW' | 'MEDIUM' | 'HIGH'
+    riskTolerance: "LOW" | "MEDIUM" | "HIGH"
   ): Promise<TradingDecision> {
     try {
       if (!marketDataArray || marketDataArray.length === 0) {
-        throw new Error('Market data array is required and must not be empty');
+        throw new Error("Market data array is required and must not be empty");
       }
 
       if (!balance || !Array.isArray(balance) || balance.length === 0) {
-        throw new Error('Balance data is required and must be a non-empty array');
+        throw new Error(
+          "Balance data is required and must be a non-empty array"
+        );
       }
 
       // const availableBalanceValue = this.getAssetAvailableBalance(balance);
@@ -240,11 +204,16 @@ export class OpenAIDecisionEngine {
       );
       const response = await this.callOpenAI(prompt);
       // Parse the AI response to get the selected token and decision
-      const parsedDecision = this.parseTokenSelection(response, marketDataArray);
+      const parsedDecision = this.parseTokenSelection(
+        response,
+        marketDataArray
+      );
 
       // Get detailed analysis for the selected token
       const selectedMarketData = marketDataArray.find(
-        data => data.token.toLowerCase() === parsedDecision.selectedToken?.token.toLowerCase()
+        (data) =>
+          data.token.toLowerCase() ===
+          parsedDecision.selectedToken?.token.toLowerCase()
       );
 
       if (!selectedMarketData) {
@@ -253,14 +222,23 @@ export class OpenAIDecisionEngine {
         return {
           ...parsedDecision,
           selectedToken: fallbackData,
-          stopLoss: this.calculateStopLoss(fallbackData.price, parsedDecision.riskLevel),
-          takeProfit: this.calculateTakeProfit(fallbackData.price, parsedDecision.riskLevel),
+          stopLoss: this.calculateStopLoss(
+            fallbackData.price,
+            parsedDecision.riskLevel
+          ),
+          takeProfit: this.calculateTakeProfit(
+            fallbackData.price,
+            parsedDecision.riskLevel
+          ),
           marketConditions: this.identifyMarketConditions(fallbackData),
         };
       }
 
       // Assess risk for selected token
-      const riskAssessment = await this.assessRisk(selectedMarketData, parsedDecision.action);
+      const riskAssessment = await this.assessRisk(
+        selectedMarketData,
+        parsedDecision.action
+      );
 
       // Determine position size
       const positionSizing = await this.determinePositionSize(
@@ -276,13 +254,19 @@ export class OpenAIDecisionEngine {
         reasoning: parsedDecision.reasoning,
         riskLevel: riskAssessment.riskLevel,
         positionSize: positionSizing.positionSize,
-        stopLoss: this.calculateStopLoss(selectedMarketData.price, riskAssessment.riskLevel),
-        takeProfit: this.calculateTakeProfit(selectedMarketData.price, riskAssessment.riskLevel),
+        stopLoss: this.calculateStopLoss(
+          selectedMarketData.price,
+          riskAssessment.riskLevel
+        ),
+        takeProfit: this.calculateTakeProfit(
+          selectedMarketData.price,
+          riskAssessment.riskLevel
+        ),
         marketConditions: this.identifyMarketConditions(selectedMarketData),
         selectedToken: selectedMarketData,
       };
     } catch (error) {
-      console.error('Error getting best trading recommendation:', error);
+      console.error("Error getting best trading recommendation:", error);
       // Fallback to first token with default decision
       const fallbackData = marketDataArray[0];
       return this.getDefaultDecision(fallbackData);
@@ -294,16 +278,16 @@ export class OpenAIDecisionEngine {
    */
   private async callOpenAI(prompt: string): Promise<string> {
     try {
-      const response = await this.client.post('/chat/completions', {
+      const response = await this.client.post("/chat/completions", {
         model: this.model,
         messages: [
           {
-            role: 'system',
+            role: "system",
             content:
-              'You are an expert cryptocurrency trading analyst. Provide clear, actionable trading recommendations based on technical and fundamental analysis. Always consider risk management.',
+              "You are an expert cryptocurrency trading analyst. Provide clear, actionable trading recommendations based on technical and fundamental analysis. Always consider risk management.",
           },
           {
-            role: 'user',
+            role: "user",
             content: prompt,
           },
         ],
@@ -313,7 +297,7 @@ export class OpenAIDecisionEngine {
       });
       return response.data.choices[0].message.content;
     } catch (error: any) {
-      console.error('OpenAI API error:', error);
+      console.error("OpenAI API error:", error);
       throw new Error(
         `OpenAI API call failed: ${error.response?.data?.error?.message || error.message}`
       );
@@ -325,7 +309,7 @@ export class OpenAIDecisionEngine {
    */
   private buildMarketAnalysisPrompt(marketData: MarketAnalysis): string {
     return (
-      this.prompts.market_analysis.replace('{token}', marketData.token) +
+      this.prompts.market_analysis.replace("{token}", marketData.token) +
       `\n\nCurrent Market Data:
 - Price: $${marketData.price}
 - 24h Volume: $${marketData.volume24h.toLocaleString()}
@@ -348,9 +332,12 @@ Provide your analysis and recommendation.`
   /**
    * Build risk assessment prompt
    */
-  private buildRiskAssessmentPrompt(marketData: MarketAnalysis, proposedAction: string): string {
+  private buildRiskAssessmentPrompt(
+    marketData: MarketAnalysis,
+    proposedAction: string
+  ): string {
     return (
-      this.prompts.risk_assessment.replace('{token}', marketData.token) +
+      this.prompts.risk_assessment.replace("{token}", marketData.token) +
       `\n\nProposed Action: ${proposedAction}
 Market Data:
 - Volatility: ${marketData.volatility}%
@@ -371,7 +358,7 @@ Assess the risk level and provide detailed reasoning.`
     riskTolerance: string
   ): string {
     return (
-      this.prompts.position_sizing.replace('{token}', marketData.token) +
+      this.prompts.position_sizing.replace("{token}", marketData.token) +
       `\n\nAvailable Balance: $${availableBalance}
 Risk Tolerance: ${riskTolerance}
 Token Volatility: ${marketData.volatility}%
@@ -390,25 +377,25 @@ Determine optimal position size (0-100% of available balance).`
     agentPositions: Position[],
     riskTolerance: string
   ): string {
-    const usdtBalance = this.getAssetAvailableBalance(balance, 'USDT');
+    const usdtBalance = this.getAssetAvailableBalance(balance, "USDT");
     const balanceBreakdown = balance.length
       ? balance
-          .map(b => {
+          .map((b) => {
             const amount = this.parseBalanceValue(b.availableBalance);
             return `${b.asset}: $${amount.toLocaleString()}`;
           })
-          .join(', ')
-      : 'No balances available';
+          .join(", ")
+      : "No balances available";
 
     const positionsSummary =
       agentPositions && agentPositions.length
         ? agentPositions
-            .map(p => {
+            .map((p) => {
               const sideLabel = p.positionSide;
               return `${p.symbol} (${sideLabel}) - Size: ${p.positionAmt}, Entry: $${p.entryPrice}`;
             })
-            .join('; ')
-        : 'No currently open positions (you may open a new one if justified)';
+            .join("; ")
+        : "No currently open positions (you may open a new one if justified)";
 
     const multipleTokens = marketDataArray.length > 1;
 
@@ -472,8 +459,8 @@ ACTION: [BUY/SELL/HOLD]
 CONFIDENCE: [0-100]%
 REASONING: [${
       multipleTokens
-        ? 'Brief explanation of why this token was selected and why others were not selected'
-        : 'Brief explanation of your recommended action for this token'
+        ? "Brief explanation of why this token was selected and why others were not selected"
+        : "Brief explanation of your recommended action for this token"
     }]`;
 
     return prompt;
@@ -497,7 +484,7 @@ REASONING: [${
       const tokenName = tokenMatch[1].trim();
       // Try to find matching token in the array
       const matchedToken = marketDataArray.find(
-        data =>
+        (data) =>
           data.token.toLowerCase().includes(tokenName.toLowerCase()) ||
           tokenName.toLowerCase().includes(data.token.toLowerCase())
       );
@@ -509,11 +496,15 @@ REASONING: [${
 
     // Extract action
     const actionMatch =
-      response.match(/ACTION:\s*(BUY|SELL|HOLD)/i) || response.match(/\b(BUY|SELL|HOLD)\b/i);
-    const action = actionMatch ? (actionMatch[1].toUpperCase() as 'BUY' | 'SELL' | 'HOLD') : 'HOLD';
+      response.match(/ACTION:\s*(BUY|SELL|HOLD)/i) ||
+      response.match(/\b(BUY|SELL|HOLD)\b/i);
+    const action = actionMatch
+      ? (actionMatch[1].toUpperCase() as "BUY" | "SELL" | "HOLD")
+      : "HOLD";
 
     // Extract confidence
-    const confidenceMatch = response.match(/CONFIDENCE:\s*(\d+)/i) || response.match(/(\d+)%/);
+    const confidenceMatch =
+      response.match(/CONFIDENCE:\s*(\d+)/i) || response.match(/(\d+)%/);
     const confidence = confidenceMatch ? parseInt(confidenceMatch[1]) : 50;
 
     // Extract reasoning
@@ -522,7 +513,8 @@ REASONING: [${
 
     // Get market data for selected token to assess risk
     const selectedMarketData =
-      marketDataArray.find(data => data.token === selectedToken?.token) || marketDataArray[0];
+      marketDataArray.find((data) => data.token === selectedToken?.token) ||
+      marketDataArray[0];
 
     return {
       action,
@@ -538,9 +530,14 @@ REASONING: [${
   /**
    * Parse trading decision from AI response
    */
-  private parseTradingDecision(response: string, marketData: MarketAnalysis): TradingDecision {
+  private parseTradingDecision(
+    response: string,
+    marketData: MarketAnalysis
+  ): TradingDecision {
     const actionMatch = response.match(/\b(BUY|SELL|HOLD)\b/i);
-    const action = actionMatch ? (actionMatch[1].toUpperCase() as 'BUY' | 'SELL' | 'HOLD') : 'HOLD';
+    const action = actionMatch
+      ? (actionMatch[1].toUpperCase() as "BUY" | "SELL" | "HOLD")
+      : "HOLD";
 
     // Extract confidence from response (look for percentage)
     const confidenceMatch = response.match(/(\d+)%/);
@@ -560,14 +557,14 @@ REASONING: [${
    * Parse risk assessment from AI response
    */
   private parseRiskAssessment(response: string): {
-    riskLevel: 'LOW' | 'MEDIUM' | 'HIGH';
+    riskLevel: "LOW" | "MEDIUM" | "HIGH";
     reasoning: string;
     riskFactors: string[];
   } {
     const riskMatch = response.match(/\b(LOW|MEDIUM|HIGH)\b/i);
     const riskLevel = riskMatch
-      ? (riskMatch[1].toUpperCase() as 'LOW' | 'MEDIUM' | 'HIGH')
-      : 'MEDIUM';
+      ? (riskMatch[1].toUpperCase() as "LOW" | "MEDIUM" | "HIGH")
+      : "MEDIUM";
 
     return {
       riskLevel,
@@ -599,12 +596,13 @@ REASONING: [${
    */
   private getDefaultDecision(marketData: MarketAnalysis): TradingDecision {
     return {
-      action: 'HOLD',
+      action: "HOLD",
       confidence: 30,
-      reasoning: 'Unable to analyze market due to API error. Defaulting to HOLD position.',
-      riskLevel: 'HIGH',
+      reasoning:
+        "Unable to analyze market due to API error. Defaulting to HOLD position.",
+      riskLevel: "HIGH",
       positionSize: 0,
-      marketConditions: ['API_ERROR'],
+      marketConditions: ["API_ERROR"],
       selectedToken: marketData,
     };
   }
@@ -612,13 +610,15 @@ REASONING: [${
   /**
    * Assess risk level from market data
    */
-  private assessRiskFromData(marketData: MarketAnalysis): 'LOW' | 'MEDIUM' | 'HIGH' {
+  private assessRiskFromData(
+    marketData: MarketAnalysis
+  ): "LOW" | "MEDIUM" | "HIGH" {
     if (marketData.volatility > 20 || marketData.liquidity < 100000) {
-      return 'HIGH';
+      return "HIGH";
     } else if (marketData.volatility > 10 || marketData.liquidity < 500000) {
-      return 'MEDIUM';
+      return "MEDIUM";
     }
-    return 'LOW';
+    return "LOW";
   }
 
   /**
@@ -626,7 +626,9 @@ REASONING: [${
    */
   private calculateStopLoss(currentPrice: number, riskLevel: string): number {
     const stopLossPercentages = { LOW: 0.02, MEDIUM: 0.05, HIGH: 0.08 };
-    const percentage = stopLossPercentages[riskLevel as keyof typeof stopLossPercentages] || 0.05;
+    const percentage =
+      stopLossPercentages[riskLevel as keyof typeof stopLossPercentages] ||
+      0.05;
     return currentPrice * (1 - percentage);
   }
 
@@ -636,7 +638,8 @@ REASONING: [${
   private calculateTakeProfit(currentPrice: number, riskLevel: string): number {
     const takeProfitPercentages = { LOW: 0.04, MEDIUM: 0.1, HIGH: 0.16 };
     const percentage =
-      takeProfitPercentages[riskLevel as keyof typeof takeProfitPercentages] || 0.1;
+      takeProfitPercentages[riskLevel as keyof typeof takeProfitPercentages] ||
+      0.1;
     return currentPrice * (1 + percentage);
   }
 
@@ -646,15 +649,17 @@ REASONING: [${
   private identifyMarketConditions(marketData: MarketAnalysis): string[] {
     const conditions = [];
 
-    if (marketData.volatility > 15) conditions.push('HIGH_VOLATILITY');
-    if (marketData.liquidity < 100000) conditions.push('LOW_LIQUIDITY');
-    if (marketData.volume24h < 10000) conditions.push('LOW_VOLUME');
-    if (marketData.priceChange24h > 10) conditions.push('HIGH_MOMENTUM');
-    if (marketData.priceChange24h < -10) conditions.push('DOWNTREND');
-    if (marketData.sentiment === 'bullish') conditions.push('BULLISH_SENTIMENT');
-    if (marketData.sentiment === 'bearish') conditions.push('BEARISH_SENTIMENT');
+    if (marketData.volatility > 15) conditions.push("HIGH_VOLATILITY");
+    if (marketData.liquidity < 100000) conditions.push("LOW_LIQUIDITY");
+    if (marketData.volume24h < 10000) conditions.push("LOW_VOLUME");
+    if (marketData.priceChange24h > 10) conditions.push("HIGH_MOMENTUM");
+    if (marketData.priceChange24h < -10) conditions.push("DOWNTREND");
+    if (marketData.sentiment === "bullish")
+      conditions.push("BULLISH_SENTIMENT");
+    if (marketData.sentiment === "bearish")
+      conditions.push("BEARISH_SENTIMENT");
 
-    return conditions.length > 0 ? conditions : ['NORMAL'];
+    return conditions.length > 0 ? conditions : ["NORMAL"];
   }
 
   /**
@@ -662,9 +667,15 @@ REASONING: [${
    */
   private extractRiskFactors(response: string): string[] {
     const factors: string[] = [];
-    const riskKeywords = ['volatility', 'liquidity', 'volume', 'momentum', 'trend'];
+    const riskKeywords = [
+      "volatility",
+      "liquidity",
+      "volume",
+      "momentum",
+      "trend",
+    ];
 
-    riskKeywords.forEach(keyword => {
+    riskKeywords.forEach((keyword) => {
       if (response.toLowerCase().includes(keyword)) {
         factors.push(keyword.toUpperCase());
       }
@@ -677,10 +688,10 @@ REASONING: [${
    * Safely parse numeric balance from string/number inputs
    */
   private parseBalanceValue(value: string | number | undefined): number {
-    if (typeof value === 'number') {
+    if (typeof value === "number") {
       return Number.isFinite(value) ? value : 0;
     }
-    if (typeof value === 'string') {
+    if (typeof value === "string") {
       const parsed = parseFloat(value);
       return Number.isFinite(parsed) ? parsed : 0;
     }
@@ -690,12 +701,14 @@ REASONING: [${
   /**
    * Get available balance for a specific asset (defaults to USDT)
    */
-  private getAssetAvailableBalance(balance: Balance[], asset = 'USDT'): number {
+  private getAssetAvailableBalance(balance: Balance[], asset = "USDT"): number {
     if (!Array.isArray(balance) || balance.length === 0) {
       return 0;
     }
 
-    const entry = balance.find(b => b.asset?.toUpperCase() === asset.toUpperCase());
+    const entry = balance.find(
+      (b) => b.asset?.toUpperCase() === asset.toUpperCase()
+    );
 
     return entry ? this.parseBalanceValue(entry.availableBalance) : 0;
   }
