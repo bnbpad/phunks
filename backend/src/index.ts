@@ -2,7 +2,7 @@ import { app, server } from "./app";
 import { open } from "./database";
 import { swaggerSpec } from "./config/swagger";
 import swaggerUi from "swagger-ui-express";
-import "./scripts/testPortfolioDecision";
+// import "./scripts/testPortfolioDecision";
 
 open();
 
