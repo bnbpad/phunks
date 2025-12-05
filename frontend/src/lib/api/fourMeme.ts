@@ -49,7 +49,7 @@ async function invokeFourMeme({
 
 // Helper function to check API success
 export const isApiSuccess = (response: any): boolean => {
-  return response && (response.code === 1 || response.code === "1" || response.data);
+  return response && (response.code === 0 || response.code === "0" || response.data);
 };
 
 // Step 1: Generate Nonce for Authentication
@@ -72,22 +72,41 @@ export const loginFourMeme = (data: LoginRequest): Promise<LoginResponse> => {
   }) as Promise<LoginResponse>;
 };
 
-// Step 3: Upload Token Image (using proxy approach for CORS)
+// Step 3: Upload Token Image
 export const uploadTokenImageFourMeme = async (
   file: File,
   accessToken: string
 ): Promise<UploadImageResponse> => {
   try {
-    // For now, return a mock success response since we can't upload directly
-    // In production, this should go through your backend API
-    console.warn('Image upload skipped due to CORS restrictions - using default image');
-    return {
-      data: {
-        code: "1",
-        message: "Success",
-        data: 'https://public.bnbstatic.com/image/cms/blog/20190313/977e803b-c37e-4eb2-91fb-1a744a9bc7b6.png'
+    // Try direct API call first, fallback to mock if CORS fails
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch(`${FOUR_MEME_BASE_URL}/v1/private/token/upload`, {
+        method: 'POST',
+        headers: {
+          'meme-web-access': accessToken,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-    };
+
+      return await response.json();
+    } catch (corsError) {
+      // If CORS error, return mock response for development
+      if (corsError instanceof TypeError || corsError.toString().includes('CORS')) {
+        console.warn('CORS error detected for image upload, using default image');
+        return {
+          code: "0",
+          data: 'https://public.bnbstatic.com/image/cms/blog/20190313/977e803b-c37e-4eb2-91fb-1a744a9bc7b6.png'
+        };
+      }
+      throw corsError;
+    }
   } catch (error) {
     console.error('Upload image error:', error);
     throw new Error('Failed to upload token image');
@@ -121,21 +140,18 @@ export const createTokenFourMeme = async (
       if (corsError instanceof TypeError || corsError.toString().includes('CORS')) {
         console.warn('CORS error detected, using mock response for development');
         return {
+          code: "0",
           data: {
-            code: "1",
-            message: "Success",
-            data: {
-              tokenId: 12345,
-              totalAmount: "1000000000",
-              saleAmount: "800000000",
-              template: 1,
-              launchTime: Date.now(),
-              serverTime: Date.now(),
-              createArg: "0x" + "0".repeat(64), // Mock hex data
-              signature: "0x" + "0".repeat(130), // Mock signature
-              bamount: "24",
-              tamount: "1000000000"
-            }
+            tokenId: 12345,
+            totalAmount: "1000000000",
+            saleAmount: "800000000",
+            template: 1,
+            launchTime: Date.now(),
+            serverTime: Date.now(),
+            createArg: "0x" + "0".repeat(64), // Mock hex data
+            signature: "0x" + "0".repeat(130), // Mock signature
+            bamount: "24",
+            tamount: "1000000000"
           }
         };
       }

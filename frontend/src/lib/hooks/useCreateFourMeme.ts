@@ -97,7 +97,7 @@ export const useCreateFourMeme = (
           throw new Error((uploadResponse as any)?.msg || 'Failed to upload image');
         }
 
-        imageUrl = (uploadResponse as any)?.data?.data || '';
+        imageUrl = (uploadResponse as any)?.data || '';
         afterImageUpload(imageUrl);
       }
 
@@ -142,7 +142,7 @@ export const useCreateFourMeme = (
 
       // 5. Blockchain Transaction
       console.log('Executing blockchain transaction...');
-      const createData = (createResponse as any)?.data?.data;
+      const createData = (createResponse as any)?.data;
       if (!createData?.createArg || !createData?.signature) {
         throw new Error('Invalid response from FourMeme API - missing transaction data');
       }

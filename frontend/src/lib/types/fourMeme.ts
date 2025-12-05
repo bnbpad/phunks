@@ -102,12 +102,8 @@ export interface LoginResponse {
 }
 
 export interface UploadImageResponse {
-  code?: string | number;
-  data: {
-    message?: string;
-    code?: string;
-    data: string; // image URL
-  };
+  code: string | number;
+  data: string; // image URL
   msg?: string;
 }
 
@@ -135,22 +131,20 @@ export interface CreateTokenRequest {
 }
 
 export interface CreateTokenResponse {
+  code: string;
   data: {
-    code: string;
-    message: string;
-    data: {
-      tokenId: number;
-      totalAmount: string;
-      saleAmount: string;
-      template: number;
-      launchTime: number; // Unix timestamp in seconds
-      serverTime: number;
-      createArg: string; // Hex string starting with 0x
-      signature: string; // Hex string starting with 0x (65 bytes = 130 hex chars + 0x = 132 chars)
-      bamount: string;
-      tamount: string;
-    };
+    tokenId: number;
+    totalAmount: string;
+    saleAmount: string;
+    template: number;
+    launchTime: number; // Unix timestamp in seconds
+    serverTime: number;
+    createArg: string; // Hex string starting with 0x
+    signature: string; // Hex string starting with 0x (65 bytes = 130 hex chars + 0x = 132 chars)
+    bamount: string;
+    tamount: string;
   };
+  msg?: string;
 }
 
 export interface SaveTokenRequest extends CreateTokenRequest {
