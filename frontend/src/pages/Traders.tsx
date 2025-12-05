@@ -17,13 +17,58 @@ const Traders = () => {
     sortOrder: 'desc'
   })
 
+  // Debug logging
+  console.log('API Response:', { agents, isLoading, error, pagination })
+  console.log('Agents length:', agents.length)
+
+  // Keep original static data as fallback for development
+  const fallbackAgents = [
+    {
+      id: '1',
+      name: 'Alpha Strategy',
+      symbol: 'ALPHA',
+      pnl: 127.5,
+      health: 92,
+      evolution: 3,
+      trades: 1247,
+      image: '/avatars/avatar1.png'
+    },
+    {
+      id: '2',
+      name: 'Smart Scalper',
+      symbol: 'SCALP',
+      pnl: 89.3,
+      health: 85,
+      evolution: 2,
+      trades: 892,
+      image: '/avatars/avatar2.png'
+    },
+    {
+      id: '3',
+      name: 'Trend Master',
+      symbol: 'TREND',
+      pnl: 156.8,
+      health: 78,
+      evolution: 4,
+      trades: 2103,
+      image: '/avatars/avatar3.png'
+    }
+  ]
+
+  // Use API data if available, fallback to static data if API fails or returns empty
+  const agentsToUse = agents.length > 0 ? agents : (error ? fallbackAgents : [])
+  console.log('Using agents:', agentsToUse.length > 0 ? 'API data' : 'fallback data', agentsToUse.length)
+
   // Client-side filtering for non-API supported filters
-  const filteredAgents = agents.filter(agent => {
+  const filteredAgents = agentsToUse.filter(agent => {
     if (filterBy === 'profitable') return agent.pnl > 0
     if (filterBy === 'losing') return agent.pnl < 0
     if (filterBy === 'high-performance') return agent.health >= 80
     return true
   })
+
+  // Debug filtered results
+  console.log('Filtered agents:', filteredAgents, 'Length:', filteredAgents.length)
 
   // Keep original static data as fallback (remove this after API testing)
   const allAgents = [
@@ -182,10 +227,10 @@ const Traders = () => {
   // Note: Filtering and sorting now handled by API, fallback logic exists above
 
   const stats = {
-    total: pagination?.totalAgents || agents.length,
-    profitable: agents.filter(t => t.pnl > 0).length,
-    totalVolume: agents.reduce((sum, t) => sum + t.trades, 0),
-    avgPerformance: agents.length > 0 ? (agents.reduce((sum, t) => sum + t.pnl, 0) / agents.length).toFixed(1) : '0.0'
+    total: pagination?.totalAgents || agentsToUse.length,
+    profitable: agentsToUse.filter(t => t.pnl > 0).length,
+    totalVolume: agentsToUse.reduce((sum, t) => sum + t.trades, 0),
+    avgPerformance: agentsToUse.length > 0 ? (agentsToUse.reduce((sum, t) => sum + t.pnl, 0) / agentsToUse.length).toFixed(1) : '0.0'
   }
 
   // Loading state

@@ -71,9 +71,12 @@ export const useAgents = (params: AgentsListParams = {}) => {
     setError(null);
 
     try {
+      console.log('Fetching agents with params:', { ...params, ...newParams });
       const agentsData = await fetchAgentsList({ ...params, ...newParams });
+      console.log('Fetched agents data:', agentsData);
       setData(agentsData);
     } catch (err) {
+      console.error('Error in loadAgents:', err);
       setError(handleApiError(err));
     } finally {
       setIsLoading(false);
