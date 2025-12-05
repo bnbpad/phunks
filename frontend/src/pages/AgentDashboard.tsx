@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { Activity, TrendingUp, TrendingDown, Zap, Shield, Clock, DollarSign, BarChart3, Eye, ArrowLeft } from 'lucide-react'
+import { Activity, TrendingUp, TrendingDown, Zap, Shield, Clock, DollarSign, BarChart3, Eye, ArrowLeft, Users } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import ActivityEvolutionChanges from '../components/ActivityEvolutionChanges'
 import EvolutionChangesModal from '../components/EvolutionChangesModal'
@@ -39,6 +39,7 @@ const AgentDashboard = () => {
     currentPrice: '$256.89',
     unrealizedPnL: '+4.74%',
     description: t('agent.description'),
+    image: '/avatars/avatar1.png'
   }
 
   const recentTrades = [
@@ -191,8 +192,8 @@ const AgentDashboard = () => {
       <div className="bg-white card-shadow rounded-xl p-8">
         <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
           <div className="flex items-start gap-4">
-            <div className="w-16 h-16 rounded-xl bg-bsc-100 flex items-center justify-center">
-              <BarChart3 className="w-8 h-8 text-bsc-600" />
+            <div className="w-16 h-16 rounded-xl overflow-hidden bg-gray-100">
+              <img src={agentData.image} alt={agentData.name} className="w-full h-full object-cover" />
             </div>
             <div>
               <h1 className="text-3xl font-orbitron font-black text-gray-900">{agentData.name}</h1>
