@@ -174,7 +174,7 @@ export const useCreateFourMeme = (
       const response = await fourMemeApi.saveFourMemeToken({
         ...createTokenRequest,
         txHash: trxHash,
-        chainID: 56,
+        chainId: 56,
         aiThesis: formData.aiThesis || undefined,
       });
 
@@ -189,36 +189,25 @@ export const useCreateFourMeme = (
 
       // 7. Create AI Agent if AI thesis is provided
       let agentMessage = "Token created successfully on FourMeme";
-      if (formData.aiThesis && formData.aiThesis.goals && formData.aiThesis.memory &&
-          formData.aiThesis.persona && formData.aiThesis.experience) {
+      const agentTrxHash = await writeContract(wagmiConfig, {
+        abi: appConfig.contracts.agentLaunchpad.abi,
+        address: appConfig.contracts.agentLaunchpad.address as `0x${string}`,
+        functionName: "createAgent",
+        args: [
+          response.data.tokenAddress as `0x${string}`, // fourToken
+          formData.aiThesis.goals,                     // goal
+          formData.aiThesis.memory,                    // brainMemory
+          formData.aiThesis.persona,                   // persona
+          formData.aiThesis.experience                 // experience
+        ],
+        account: address,
+        chain: bsc,
+      });
 
-        console.log('Creating AI Agent on launchpad...');
-        try {
-          const agentTrxHash = await writeContract(wagmiConfig, {
-            abi: appConfig.contracts.agentLaunchpad.abi,
-            address: appConfig.contracts.agentLaunchpad.address as `0x${string}`,
-            functionName: "createAgent",
-            args: [
-              response.data.tokenAddress as `0x${string}`, // fourToken
-              formData.aiThesis.goals,                     // goal
-              formData.aiThesis.memory,                    // brainMemory
-              formData.aiThesis.persona,                   // persona
-              formData.aiThesis.experience                 // experience
-            ],
-            account: address,
-            chain: bsc,
-          });
-
-          if (agentTrxHash) {
-            await waitForTransactionReceipt(wagmiConfig, { hash: agentTrxHash });
-            agentMessage = "Token and AI Agent created successfully!";
-            console.log('AI Agent created with txHash:', agentTrxHash);
-          }
-        } catch (agentError) {
-          console.error('Agent creation error:', agentError);
-          // Don't fail the entire flow if agent creation fails, just update message
-          agentMessage = "Token created successfully, but AI Agent creation failed";
-        }
+      if (agentTrxHash) {
+        await waitForTransactionReceipt(wagmiConfig, { hash: agentTrxHash });
+        agentMessage = "Token and AI Agent created successfully!";
+        console.log('AI Agent created with txHash:', agentTrxHash);
       }
 
       onSuccess({

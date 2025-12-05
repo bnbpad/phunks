@@ -151,7 +151,7 @@ export const createTokenFourMeme = (
 
 export interface SaveTokenRequest extends CreateTokenRequest {
   txHash: string;
-  chainID: number;
+  chainId: number;
   apiKey?: string;
   apiSecret?: string;
   aiThesis?: AIThesisConfig;
