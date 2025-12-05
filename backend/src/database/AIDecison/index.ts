@@ -3,7 +3,7 @@ import { AIDecisionResult } from "../../controllers/ai-models/OllamaDecisionEngi
 
 export type IAIDecision = {
   id?: string;
-  agentId: string;
+  agentId: string; // token Address
   decision: AIDecisionResult;
   prompt: string;
   tasks: string[];

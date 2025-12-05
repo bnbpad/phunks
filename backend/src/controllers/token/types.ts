@@ -1,5 +1,5 @@
 import { IPool, TokenLinks } from "../../database/token";
-import { IAiThesisPayload } from "../../database/aiThesis";
+import { IAIThesis } from "../../database/aiThesis";
 
 export interface ICreateToken {
   basicDetails: {
@@ -30,7 +30,7 @@ export interface ICreateToken {
   links: TokenLinks;
   txHash: string;
   pool: IPool;
-  aiThesis: IAiThesisPayload;
+  aiThesis: IAIThesis;
 }
 export interface ITokenResult {
   id: string;
