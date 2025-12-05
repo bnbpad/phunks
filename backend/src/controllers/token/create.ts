@@ -1,17 +1,16 @@
-import { AiThesisModel, IAiThesisPayload } from '../../database/aiThesis';
-import { IToken, Tokens } from '../../database/token';
-import { ICreateFourMemeToken, ICreateToken } from './types';
-import { CHAIN_CONFIG, ChainID } from '../../utils/constant';
+import { AiThesisModel, IAiThesisPayload } from "../../database/aiThesis";
+import { IToken, Tokens } from "../../database/token";
+import { ICreateFourMemeToken, ICreateToken } from "./types";
+import { CHAIN_CONFIG, ChainID } from "../../utils/constant";
 import {
   getPoolDetailsFromCreateTx,
   getFourMemeTokenDetailsFromTx,
   getTokenInfoFromTokenManagerV2,
   getERC20TokenDetails,
-} from '../../utils/contract';
+} from "../../utils/contract";
 
-import { BadRequestError } from '../../errors';
-import { IUserModel } from '../../database/user';
-import axios from 'axios';
+import { BadRequestError } from "../../errors";
+import axios from "axios";
 
 /**
  * Validate the token creation
@@ -20,20 +19,22 @@ import axios from 'axios';
  */
 export const validateTokenCreation = async (
   data: ICreateToken,
-  validateOnChain = false,
-  loggedInUser?: IUserModel,
   dex?: string
 ) => {
-  const { basicDetails, tokenomics, links, txHash } = data;
+  const { basicDetails, tokenomics, links, txHash, walletAddress } = data;
 
   try {
-    if (await Tokens.exists({ 'basicDetails.address': basicDetails.address }))
-      throw new BadRequestError('Token address already exists');
+    if (await Tokens.exists({ "basicDetails.address": basicDetails.address }))
+      throw new BadRequestError("Token address already exists");
 
-    if (!txHash) throw new BadRequestError('Invalid body: txHash is required');
-    if (!CHAIN_CONFIG[basicDetails.chainId]) throw new BadRequestError('Unsupported chain ID');
-    if (!basicDetails || !tokenomics || !links) throw new BadRequestError('Invalid body');
-    if (!basicDetails.address) throw new BadRequestError('Token address not found');
+    if (!txHash) throw new BadRequestError("Invalid body: txHash is required");
+    if (!CHAIN_CONFIG[basicDetails.chainId])
+      throw new BadRequestError("Unsupported chain ID");
+    if (!basicDetails || !tokenomics || !links)
+      throw new BadRequestError("Invalid body");
+    if (!basicDetails.address)
+      throw new BadRequestError("Token address not found");
+    if (!walletAddress) throw new BadRequestError("Wallet address is required");
 
     if (!tokenomics.creatorAllocation) {
       tokenomics.creatorAllocation = 1;
@@ -42,46 +43,56 @@ export const validateTokenCreation = async (
     const { aiThesis: _aiThesis, ...tokenDataWithoutAiThesis } = data;
     const tokenData: IToken = {
       ...tokenDataWithoutAiThesis,
-      walletAddress: loggedInUser?.walletAddress || '0x0',
-      dex: (dex as 'pancake' | 'fourmeme') || 'pancake',
+      walletAddress,
+      dex: (dex as "pancake" | "fourmeme") || "pancake",
     };
     await Tokens.validate(tokenData);
   } catch (error) {
-    throw new BadRequestError(error instanceof Error ? error.message : 'Invalid body');
+    throw new BadRequestError(
+      error instanceof Error ? error.message : "Invalid body"
+    );
   }
 };
 
 export const createToken = async (
-  body: ICreateToken & { apiKey?: string; apiSecret?: string },
-  loggedInUser: IUserModel
+  body: ICreateToken & { apiKey?: string; apiSecret?: string }
 ) => {
-  const { basicDetails, tokenomics, links, txHash, aiThesis } = body;
+  const { basicDetails, tokenomics, links, txHash, aiThesis, walletAddress } =
+    body;
 
   if (!basicDetails || !tokenomics || !links || !txHash || !aiThesis) {
-    throw new BadRequestError('Invalid body');
+    throw new BadRequestError("Invalid body");
   }
   if (basicDetails.desc.length > 280) {
-    throw new BadRequestError('Invalid body: description cannot be more than 280 characters');
+    throw new BadRequestError(
+      "Invalid body: description cannot be more than 280 characters"
+    );
   }
   if (basicDetails.name.length > 20) {
-    throw new BadRequestError('Invalid body: name cannot be more than 20 characters');
+    throw new BadRequestError(
+      "Invalid body: name cannot be more than 20 characters"
+    );
   }
   if (basicDetails.symbol.length > 10) {
-    throw new BadRequestError('Invalid body: symbol cannot be more than 10 characters');
+    throw new BadRequestError(
+      "Invalid body: symbol cannot be more than 10 characters"
+    );
   }
 
-  const { pool, dex, token } = await getPoolDetailsFromCreateTx(txHash, basicDetails.chainId);
+  const { pool, dex, token } = await getPoolDetailsFromCreateTx(
+    txHash,
+    basicDetails.chainId
+  );
   const normalizedTokenAddress = token.toLowerCase();
   basicDetails.address = normalizedTokenAddress;
   tokenomics.dex = dex;
 
-  await validateTokenCreation(body, true, loggedInUser, dex);
   const newToken = await Tokens.create({
     dex,
     basicDetails,
     tokenomics,
     links,
-    walletAddress: loggedInUser.walletAddress.toLowerCase() || '0x0',
+    walletAddress,
     txHash,
     pool,
   });
@@ -97,22 +108,29 @@ export const createToken = async (
     tokenAddress: basicDetails.address,
     imgUrl: basicDetails.image,
     chainId: basicDetails.chainId,
-    message: 'Token created successfully',
+    message: "Token created successfully",
   };
 };
 
-export const createFourMemeToken = async (body: ICreateFourMemeToken, accessToken: string) => {
+export const createFourMemeToken = async (
+  body: ICreateFourMemeToken,
+  accessToken: string
+) => {
   try {
-    const response = await axios.post('https://four.meme/meme-api/v1/private/token/create', body, {
-      headers: {
-        'Content-Type': 'application/json',
-        'meme-web-access': accessToken,
-      },
-    });
+    const response = await axios.post(
+      "https://four.meme/meme-api/v1/private/token/create",
+      body,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "meme-web-access": accessToken,
+        },
+      }
+    );
     return response.data;
   } catch (error) {
-    console.error('Error creating Four Meme token:', error);
-    throw new BadRequestError('Failed to create Four Meme token', error);
+    console.error("Error creating Four Meme token:", error);
+    throw new BadRequestError("Failed to create Four Meme token", error);
   }
 };
 
@@ -129,7 +147,7 @@ export const saveFourMemeToken = async (
     const chainId = (body.chainId || 56) as ChainID;
 
     if (!CHAIN_CONFIG[chainId]) {
-      throw new BadRequestError('Unsupported chain ID');
+      throw new BadRequestError("Unsupported chain ID");
     }
 
     const {
@@ -138,20 +156,26 @@ export const saveFourMemeToken = async (
       dex,
     } = await getFourMemeTokenDetailsFromTx(body.txHash, chainId);
 
-    const tokenInfo = await getTokenInfoFromTokenManagerV2(tokenAddress, chainId);
+    const tokenInfo = await getTokenInfoFromTokenManagerV2(
+      tokenAddress,
+      chainId
+    );
 
-    const fundingTokenDetails = await getERC20TokenDetails(tokenInfo.quote, chainId);
+    const fundingTokenDetails = await getERC20TokenDetails(
+      tokenInfo.quote,
+      chainId
+    );
 
     const tokenData: IToken = {
-      dex: 'fourmeme',
+      dex: "fourmeme",
       basicDetails: {
         name: body.name,
         symbol: body.shortName,
-        desc: body.desc || '',
+        desc: body.desc || "",
         image: body.imgUrl,
         address: tokenAddress.toLowerCase(),
         chainId: chainId,
-        chainType: CHAIN_CONFIG[chainId] ? 'BSC' : '',
+        chainType: CHAIN_CONFIG[chainId] ? "BSC" : "",
       },
       tokenomics: {
         fundingTokenAddress: tokenInfo.quote.toLowerCase(),
@@ -169,24 +193,24 @@ export const saveFourMemeToken = async (
         creatorAllocation: null,
       },
       links: {
-        discordLink: body.webUrl || '',
-        twitterLink: body.twitterUrl || '',
-        telegramLink: body.telegramUrl || '',
-        websiteLink: body.webUrl || '',
-        twitchLink: '',
-        creatorLink: '',
-        launchTweetLink: '',
+        discordLink: body.webUrl || "",
+        twitterLink: body.twitterUrl || "",
+        telegramLink: body.telegramUrl || "",
+        websiteLink: body.webUrl || "",
+        twitchLink: "",
+        creatorLink: "",
+        launchTweetLink: "",
       },
       walletAddress: creator.toLowerCase(),
       txHash: body.txHash,
       pool: {
         pool: null,
-        dex: dex as 'fourmeme' | 'pancake' | 'thena' | null,
+        dex: dex as "fourmeme" | "pancake" | "thena" | null,
       },
     };
 
     const existingToken = await Tokens.findOne({
-      'basicDetails.address': tokenAddress.toLowerCase(),
+      "basicDetails.address": tokenAddress.toLowerCase(),
     });
 
     if (existingToken) {
@@ -195,7 +219,7 @@ export const saveFourMemeToken = async (
         tokenAddress: tokenAddress.toLowerCase(),
         imgUrl: existingToken.basicDetails.image,
         chainId: chainId,
-        message: 'Token already exists',
+        message: "Token already exists",
       };
     }
 
@@ -213,13 +237,13 @@ export const saveFourMemeToken = async (
       tokenAddress: tokenAddress.toLowerCase(),
       imgUrl: body.imgUrl,
       chainId: chainId,
-      message: 'Four Meme token saved successfully',
+      message: "Four Meme token saved successfully",
     };
   } catch (error) {
-    console.error('Error saving Four Meme token:', error);
+    console.error("Error saving Four Meme token:", error);
     if (error instanceof BadRequestError) {
       throw error;
     }
-    throw new BadRequestError('Failed to save Four Meme token', error);
+    throw new BadRequestError("Failed to save Four Meme token", error);
   }
 };

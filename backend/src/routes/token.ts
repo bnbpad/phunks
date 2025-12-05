@@ -1,8 +1,7 @@
-import { Router } from 'express';
-import rateLimit from 'express-rate-limit';
+import { Router } from "express";
+import rateLimit from "express-rate-limit";
 import {
   getToken,
-  getTokenHoldersController,
   listTokensController,
   searchData,
   uploadImage,
@@ -16,17 +15,16 @@ import {
   uploadFormemeImage,
   createFourMemeToken,
   saveFourMemeToken,
-} from '../controllers/token';
-import { localUpload } from '../utils/multer';
-import { totalRequestsIP, rateLimitWindow } from '../utils/constant';
-import { authenticate, AuthenticatedRequest } from '../middlewares/authenticate';
-import { BadRequestError } from '../errors';
-import { cacheJsonMiddleware, IResponseCached } from '../middlewares/cacheJsonMiddleware';
-import { downloadAiThesis } from '../controllers/token/aiThesis';
+} from "../controllers/token";
+import { localUpload } from "../utils/multer";
+import { totalRequestsIP, rateLimitWindow } from "../utils/constant";
+import { BadRequestError } from "../errors";
 import {
-  OpenAIDecisionEngine,
-  MarketAnalysis,
-} from '../controllers/ai-models/OpenAIDecisionEngine';
+  cacheJsonMiddleware,
+  IResponseCached,
+} from "../middlewares/cacheJsonMiddleware";
+import { downloadAiThesis } from "../controllers/token/aiThesis";
+import { OpenAIDecisionEngine } from "../controllers/ai-models/OpenAIDecisionEngine";
 
 const router = Router();
 const decisionEngine = new OpenAIDecisionEngine();
@@ -36,7 +34,7 @@ const ipLimiter = rateLimit({
   max: totalRequestsIP,
   message: {
     success: false,
-    message: 'Too many requests from this IP, please try again after an hour',
+    message: "Too many requests from this IP, please try again after an hour",
   },
 });
 
@@ -120,11 +118,15 @@ const ipLimiter = rateLimit({
  *       500:
  *         description: Internal server error
  */
-router.get('/dailyInfo', cacheJsonMiddleware(5), async (req, res: IResponseCached) => {
-  const chainId = req.query.chainId as string;
-  const data = await getDailyTokenInfo(chainId);
-  res.jsonCached({ success: true, data });
-});
+router.get(
+  "/dailyInfo",
+  cacheJsonMiddleware(5),
+  async (req, res: IResponseCached) => {
+    const chainId = req.query.chainId as string;
+    const data = await getDailyTokenInfo(chainId);
+    res.jsonCached({ success: true, data });
+  }
+);
 
 /**
  * @swagger
@@ -319,17 +321,27 @@ router.get('/dailyInfo', cacheJsonMiddleware(5), async (req, res: IResponseCache
  *       500:
  *         description: Internal server error
  */
-router.get('/getAllTokens', cacheJsonMiddleware(10), async (req, res: IResponseCached) => {
-  const { chainId, limit, page, sortBy, order } = req.query as {
-    chainId: string;
-    limit: string;
-    page: string;
-    sortBy: SortOption;
-    order: 'asc' | 'desc';
-  };
-  const data = await listTokensController(chainId, parseInt(limit), parseInt(page), sortBy, order);
-  res.jsonCached({ success: true, data });
-});
+router.get(
+  "/getAllTokens",
+  cacheJsonMiddleware(10),
+  async (req, res: IResponseCached) => {
+    const { chainId, limit, page, sortBy, order } = req.query as {
+      chainId: string;
+      limit: string;
+      page: string;
+      sortBy: SortOption;
+      order: "asc" | "desc";
+    };
+    const data = await listTokensController(
+      chainId,
+      parseInt(limit),
+      parseInt(page),
+      sortBy,
+      order
+    );
+    res.jsonCached({ success: true, data });
+  }
+);
 
 /**
  * @swagger
@@ -507,14 +519,18 @@ router.get('/getAllTokens', cacheJsonMiddleware(10), async (req, res: IResponseC
  *       500:
  *         description: Internal server error
  */
-router.get('/getToken', cacheJsonMiddleware(10), async (req, res: IResponseCached) => {
-  const { tokenAddress, chainId } = req.query as {
-    tokenAddress: string;
-    chainId: string;
-  };
-  const data = await getToken(tokenAddress, chainId);
-  res.jsonCached({ success: true, data });
-});
+router.get(
+  "/getToken",
+  cacheJsonMiddleware(10),
+  async (req, res: IResponseCached) => {
+    const { tokenAddress, chainId } = req.query as {
+      tokenAddress: string;
+      chainId: string;
+    };
+    const data = await getToken(tokenAddress, chainId);
+    res.jsonCached({ success: true, data });
+  }
+);
 
 /**
  * @swagger
@@ -637,148 +653,18 @@ router.get('/getToken', cacheJsonMiddleware(10), async (req, res: IResponseCache
  *                   type: string
  *                   example: "Internal server error"
  */
-router.get('/getTokensBySymbol', cacheJsonMiddleware(10), async (req, res: IResponseCached) => {
-  const { symbol, chainId } = req.query as {
-    symbol: string;
-    chainId: string;
-  };
-  const data = await getTokensBySymbol(symbol, chainId);
-  res.jsonCached({ success: true, data });
-});
-
-/**
- * @swagger
- * /token/holders:
- *   get:
- *     summary: Get token holders
- *     description: |
- *       Retrieves detailed information about token holders including their token balances and social media profiles.
- *       This endpoint:
- *       - Fetches holder data from the subgraph
- *       - Enriches the data with Twitter profile information
- *       - Calculates holder percentages based on total supply
- *       - Returns a sorted list of holders by token amount
- *     tags:
- *       - Token
- *     parameters:
- *       - in: query
- *         name: count
- *         required: true
- *         schema:
- *           type: integer
- *           minimum: 1
- *         description: Number of top holders to return, sorted by token amount
- *       - in: query
- *         name: chainId
- *         required: true
- *         schema:
- *           type: string
- *         description: |
- *           The blockchain network ID where the token exists.
- *           Example: "1" for Ethereum Mainnet, "56" for BSC
- *       - in: query
- *         name: tokenAddress
- *         required: true
- *         schema:
- *           type: string
- *           pattern: '^0x[a-fA-F0-9]{40}$'
- *         description: The token's contract address in checksum format
- *     responses:
- *       200:
- *         description: Successfully retrieved token holders
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       address:
- *                         type: string
- *                         description: The holder's wallet address
- *                         example: "0x1234...5678"
- *                       amount:
- *                         type: string
- *                         description: The amount of tokens held, in ether units
- *                         example: "1000.5"
- *                       percent:
- *                         type: number
- *                         format: float
- *                         description: Percentage of total supply held by this address
- *                         example: 0.1
- *                       twitterScreenName:
- *                         type: string
- *                         description: Twitter username of the holder (if linked)
- *                         example: "holder123"
- *                       followersCount:
- *                         type: number
- *                         description: Number of Twitter followers (if linked)
- *                         example: 1000
- *                       twitterProfileImageUrl:
- *                         type: string
- *                         description: URL to the holder's Twitter profile image (if linked)
- *                         example: "https://pbs.twimg.com/profile_images/..."
- *       400:
- *         description: |
- *           Bad Request - Invalid parameters provided
- *           Possible reasons:
- *           - Missing required parameters
- *           - Invalid token address format
- *           - Token is blacklisted
- *           - Unsupported chain ID
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: false
- *                 error:
- *                   type: string
- *                   example: "Invalid or unsupported chainId / graph"
- *       404:
- *         description: Token not found in the database
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: false
- *                 error:
- *                   type: string
- *                   example: "Token not found"
- *       500:
- *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: false
- *                 error:
- *                   type: string
- *                   example: "Internal server error"
- */
-router.get('/holders', cacheJsonMiddleware(10), async (req, res: IResponseCached) => {
-  const { count, chainId, tokenAddress } = req.query as {
-    count: string;
-    chainId: string;
-    tokenAddress: string;
-  };
-  const data = await getTokenHoldersController(parseInt(count), chainId, tokenAddress);
-  res.jsonCached({ success: true, data });
-});
+router.get(
+  "/getTokensBySymbol",
+  cacheJsonMiddleware(10),
+  async (req, res: IResponseCached) => {
+    const { symbol, chainId } = req.query as {
+      symbol: string;
+      chainId: string;
+    };
+    const data = await getTokensBySymbol(symbol, chainId);
+    res.jsonCached({ success: true, data });
+  }
+);
 
 /**
  * @swagger
@@ -978,11 +864,15 @@ router.get('/holders', cacheJsonMiddleware(10), async (req, res: IResponseCached
  *                   type: string
  *                   example: "Internal server error"
  */
-router.get('/search', cacheJsonMiddleware(1), async (req, res: IResponseCached) => {
-  const { chainId } = req.query as { chainId: string };
-  const data = await searchData(chainId);
-  res.jsonCached({ success: true, data });
-});
+router.get(
+  "/search",
+  cacheJsonMiddleware(1),
+  async (req, res: IResponseCached) => {
+    const { chainId } = req.query as { chainId: string };
+    const data = await searchData(chainId);
+    res.jsonCached({ success: true, data });
+  }
+);
 
 /**
  * @swagger
@@ -1148,9 +1038,9 @@ router.get('/search', cacheJsonMiddleware(1), async (req, res: IResponseCached) 
  *       500:
  *         description: Internal server error
  */
-router.post('/create', authenticate, async (req: AuthenticatedRequest, res) => {
+router.post("/create", async (req, res) => {
   const tokenData = req.body;
-  const data = await createToken(tokenData, req.user);
+  const data = await createToken(tokenData);
   res.json({ success: true, data });
 });
 
@@ -1319,9 +1209,9 @@ router.post('/create', authenticate, async (req: AuthenticatedRequest, res) => {
  *       500:
  *         description: Internal server error
  */
-router.post('/validate-create', async (req: AuthenticatedRequest, res) => {
+router.post("/validate-create", async (req, res) => {
   const tokenData = req.body as ICreateToken;
-  const data = await validateTokenCreation(tokenData, false, req.user);
+  const data = await validateTokenCreation(tokenData);
   res.json({ success: true, data });
 });
 
@@ -1412,12 +1302,11 @@ router.post('/validate-create', async (req: AuthenticatedRequest, res) => {
  *         description: Internal server error
  */
 router.post(
-  '/uploadImage',
-  authenticate,
+  "/uploadImage",
   ipLimiter,
-  localUpload.single('images'),
+  localUpload.single("images"),
   async (req, res) => {
-    if (!req.file) throw new BadRequestError('No image file provided');
+    if (!req.file) throw new BadRequestError("No image file provided");
     const data = await uploadImage(req.file);
     res.json({ success: true, data });
   }
@@ -1457,11 +1346,18 @@ router.post(
  *       500:
  *         description: Internal server error
  */
-router.get('/getTokenDetails', cacheJsonMiddleware(10), async (req, res: IResponseCached) => {
-  const { chainId, symbol } = req.query as { chainId: string; symbol: string };
-  const data = await getTokenDetails(chainId, symbol);
-  res.jsonCached({ success: true, data });
-});
+router.get(
+  "/getTokenDetails",
+  cacheJsonMiddleware(10),
+  async (req, res: IResponseCached) => {
+    const { chainId, symbol } = req.query as {
+      chainId: string;
+      symbol: string;
+    };
+    const data = await getTokenDetails(chainId, symbol);
+    res.jsonCached({ success: true, data });
+  }
+);
 
 /**
  * @swagger
@@ -1511,15 +1407,18 @@ router.get('/getTokenDetails', cacheJsonMiddleware(10), async (req, res: IRespon
  *       500:
  *         description: Internal server error.
  */
-router.get('/getAiThesis', authenticate, async (req, res) => {
-  const { tokenAddress, chainId } = req.query as { tokenAddress: string; chainId: string };
+router.get("/getAiThesis", async (req, res) => {
+  const { tokenAddress, chainId } = req.query as {
+    tokenAddress: string;
+    chainId: string;
+  };
 
   const data = await downloadAiThesis(tokenAddress, chainId);
   res.setHeader(
-    'Content-Disposition',
+    "Content-Disposition",
     `attachment; filename=aiThesis_${tokenAddress}_${chainId}.json`
   );
-  res.setHeader('Content-Type', 'application/json');
+  res.setHeader("Content-Type", "application/json");
   res.send(JSON.stringify(data, null, 2));
 });
 
@@ -1753,13 +1652,15 @@ router.get('/getAiThesis', authenticate, async (req, res) => {
  *         description: Upstream service error.
  */
 router.post(
-  '/uploadTokenImageFourMeme',
-  authenticate,
-  localUpload.single('images'),
+  "/uploadTokenImageFourMeme",
+  localUpload.single("images"),
   async (req, res) => {
-    if (!req.file) throw new BadRequestError('No image file provided');
+    if (!req.file) throw new BadRequestError("No image file provided");
 
-    const data = await uploadFormemeImage(req.file, req.headers['meme-web-access'] as string);
+    const data = await uploadFormemeImage(
+      req.file,
+      req.headers["meme-web-access"] as string
+    );
     res.json({ data });
   }
 );
@@ -1889,13 +1790,16 @@ router.post(
  *       500:
  *         description: Upstream service error.
  */
-router.post('/createFourMemeToken', authenticate, async (req, res) => {
+router.post("/createFourMemeToken", async (req, res) => {
   const body = req.body;
-  const data = await createFourMemeToken(body, req.headers['meme-web-access'] as string);
+  const data = await createFourMemeToken(
+    body,
+    req.headers["meme-web-access"] as string
+  );
   res.json({ data });
 });
 
-router.post('/saveFourMemeToken', authenticate, async (req, res) => {
+router.post("/saveFourMemeToken", async (req, res) => {
   const body = req.body;
   const data = await saveFourMemeToken(body);
   res.json({ success: true, data });
