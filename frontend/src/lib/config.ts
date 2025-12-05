@@ -1,3 +1,5 @@
+import TokenManagerABI from './abi/TokenManagerV2.json';
+
 // Application Configuration
 export const config = {
   // WalletConnect Project ID (get from https://cloud.walletconnect.com)
@@ -7,7 +9,7 @@ export const config = {
 
   // BSC Network Configuration
   network: {
-    rpcUrl: 'https://bsc-dataseed.binance.org/',
+    rpcUrl: 'https://bsc-dataseed1.binance.org/',
     chainId: 56,
     name: 'BNB Smart Chain',
     currency: {
@@ -20,7 +22,10 @@ export const config = {
 
   // Contract Addresses on BSC
   contracts: {
-    tokenManager: '0x5c952063c7fc8610FFDB798152D69F0B9550762b',
+    tokenManager: {
+      address: '0x5c952063c7fc8610FFDB798152D69F0B9550762b',
+      abi: TokenManagerABI
+    },
     agentNFT: '0x742d35Cc6634C0532925a3b8D91d99e2c4b851E8',
     // Token addresses
     tokens: {
