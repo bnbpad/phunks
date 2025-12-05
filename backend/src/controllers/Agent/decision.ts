@@ -1,14 +1,19 @@
 import { AIDecisions, IAIDecision } from "../../database/AIDecison";
 import { BadRequestError } from "../../errors";
 
+export interface EvolutionChange {
+  before: string[];
+  after: string[];
+}
+
 /**
  * Get AI decisions by agent ID
  * @param agentId - The agent ID to filter decisions by
- * @param limit - Optional limit for pagination (default: 50, max: 100)
- * @param page - Optional page number for pagination (default: 1)
- * @returns Array of AI decisions for the specified agent
+ * @returns EvolutionChange with the latest 2 task lists
  */
-export const getTasksByAgent = async (agentId: string) => {
+export const getTasksByAgent = async (
+  agentId: string
+): Promise<EvolutionChange> => {
   if (!agentId || agentId.trim() === "") {
     throw new BadRequestError("Agent ID is required");
   }
@@ -16,10 +21,16 @@ export const getTasksByAgent = async (agentId: string) => {
   const decisions = await AIDecisions.find({ agentId })
     .select("tasks")
     .sort({ createdAt: -1 })
+    .limit(2)
     .lean();
 
+  const latestTasks = decisions.map((decision) => decision.tasks || []);
+
+  const after = latestTasks[0] || [];
+  const before = latestTasks[1] || [];
+
   return {
-    success: true,
-    data: decisions,
+    before,
+    after,
   };
 };
