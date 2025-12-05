@@ -5,13 +5,11 @@ import { ICreateToken } from '../../../lib/types/fourMeme'
 interface Step2SocialLinksProps {
   data: ICreateToken
   onDataChange: (updates: Partial<ICreateToken>) => void
-  walletConnected: boolean
 }
 
 const Step2SocialLinks: React.FC<Step2SocialLinksProps> = ({
   data,
   onDataChange,
-  walletConnected
 }) => {
   const handleLinkChange = (field: keyof ICreateToken['links'], value: string) => {
     onDataChange({

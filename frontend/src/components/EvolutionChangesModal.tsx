@@ -1,5 +1,5 @@
 import React from 'react'
-import { X, ArrowRight, TrendingUp, TrendingDown, Zap, GitCommit } from 'lucide-react'
+import { X, GitCommit } from 'lucide-react'
 
 interface EvolutionChange {
   before: string[]

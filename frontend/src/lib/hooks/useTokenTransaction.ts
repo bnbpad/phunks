@@ -1,5 +1,5 @@
 import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
-import { parseEther, Abi } from 'viem'
+import { Abi } from 'viem'
 import { useState, useCallback, useEffect } from 'react'
 
 export interface TransactionState {

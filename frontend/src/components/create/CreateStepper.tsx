@@ -3,8 +3,6 @@ import {
   FileText,
   Share2,
   Brain,
-  CreditCard,
-  Receipt,
   CheckCircle,
   ArrowLeft,
   ArrowRight,

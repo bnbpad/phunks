@@ -214,7 +214,7 @@ export const useCreateFourMeme = (
     } finally {
       onEnd();
     }
-  }, [address, connectors, formData, imageFile, uploadedImageUrl, label]);
+  }, [address, connectors, formData, imageFile, uploadedImageUrl]);
 
   const createToken = useCallback(async (): Promise<{
     success: boolean;

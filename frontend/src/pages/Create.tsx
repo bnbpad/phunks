@@ -11,7 +11,7 @@ const Create = () => {
   const navigate = useNavigate()
   const [walletState] = useWallet()
   const [imageFile, setImageFile] = useState<File>()
-  const [uploadedImageUrl, setUploadedImageUrl] = useState<string>('')
+  const [uploadedImageUrl] = useState<string>('')
 
   // Modal states
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false)
@@ -54,7 +54,6 @@ const Create = () => {
   // Initialize useCreateFourMeme hook
   const {
     createToken,
-    isLoading,
     error,
     successData,
     reset
@@ -161,9 +160,9 @@ const Create = () => {
           isOpen={isSuccessModalOpen}
           onClose={handleSuccessModalClose}
           tokenData={tokenData}
-          txHash={successData.txHash}
+          txHash={successData.trxHash}
           tokenAddress={successData.tokenAddress}
-          fourMemeUrl={successData.fourMemeUrl}
+          fourMemeUrl={successData.tokenAddress ? `https://fourmeme.io/token/${successData.tokenAddress}` : ''}
         />
       )}
 
@@ -173,8 +172,8 @@ const Create = () => {
         onClose={handleFailureModalClose}
         onRetry={handleRetryCreation}
         tokenData={tokenData}
-        error={error?.message || error}
-        txHash={error?.txHash}
+        error={error?.toString() || error}
+        txHash={error?.toString()}
       />
     </div>
   )
