@@ -1,0 +1,12 @@
+dist/
+node_modules/
+package-lock.json
+config.json
+.env
+src/temp/
+uploads/
+coverage/
+.DS_Store
+tsconfig.tsbuildinfo
+temp/
+socket-events.md

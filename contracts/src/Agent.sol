@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 contract Agent {
-    address public launchpad;
+    address public immutable launchpad;
 
     constructor(address _launchpad) {
         launchpad = _launchpad;
