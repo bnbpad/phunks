@@ -1,15 +1,15 @@
-import { ethers } from 'ethers';
+import { ethers } from "ethers";
 
-import LaunchpadABI from '../abi/Launchpad.json';
-import TokenManagerV2ABI from '../abi/TokenManagerv2.json';
-import ERC20ABI from '../abi/ERC20.json';
-import PoolABI from '../abi/Pool.json';
+import LaunchpadABI from "../abi/Launchpad.json";
+import TokenManagerV2ABI from "../abi/TokenManagerv2.json";
+import ERC20ABI from "../abi/ERC20.json";
+import PoolABI from "../abi/Pool.json";
 
-import { blackListedTokens, CHAIN_CONFIG, ChainID } from './constant';
-import { BadRequestError } from '../errors';
-import nconf from '../config/nconf';
+import { blackListedTokens, CHAIN_CONFIG, ChainID } from "./constant";
+import { BadRequestError } from "../errors";
+import nconf from "../config/nconf";
 
-type ProtocolType = 'pancake' | 'fourmeme';
+type ProtocolType = "pancake" | "fourmeme";
 
 interface ContractConfig {
   abi: any;
@@ -25,20 +25,24 @@ interface ContractConfig {
  * @param chainId - The chain id
  * @returns Contract configuration
  */
-const getContractConfig = (protocol: ProtocolType, chainId: ChainID): ContractConfig => {
-  return protocol === 'pancake'
+const getContractConfig = (
+  protocol: ProtocolType,
+  chainId: ChainID
+): ContractConfig => {
+  return protocol === "pancake"
     ? {
         abi: LaunchpadABI,
         address: CHAIN_CONFIG[chainId].launchpadProxy,
-        topic: nconf.get('POOL_CREATED_TOPIC_BSC'),
-        eventName: 'PoolCreated',
+        topic: nconf.get("POOL_CREATED_TOPIC_BSC"),
+        eventName: "PoolCreated",
         validateTo: CHAIN_CONFIG[chainId].uiHelper,
       }
     : {
         abi: TokenManagerV2ABI,
-        address: nconf.get('TOKEN_MANAGER_V2_ADDRESS_BSC'),
-        topic: nconf.get('FOUR_MEME_TOKEN_CREATE_TOPIC'),
-        eventName: 'TokenCreate',
+        address: "0x5c952063c7fc8610FFDB798152D69F0B9550762b",
+        topic:
+          "0x396d5e902b675b032348d3d2e9517ee8f0c4a926603fbc075d3d282ff00cad20",
+        eventName: "TokenCreate",
       };
 };
 
@@ -48,8 +52,10 @@ const getContractConfig = (protocol: ProtocolType, chainId: ChainID): ContractCo
  * @param provider - Ethers provider
  * @returns Contract instance
  */
-const getContract = (config: ContractConfig, provider: ethers.Provider): ethers.Contract =>
-  new ethers.Contract(config.address, config.abi, provider);
+const getContract = (
+  config: ContractConfig,
+  provider: ethers.Provider
+): ethers.Contract => new ethers.Contract(config.address, config.abi, provider);
 
 /**
  * Generic function to get token details from transaction hash
@@ -61,19 +67,16 @@ const getContract = (config: ContractConfig, provider: ethers.Provider): ethers.
 export const getTokenDetailsFromCreateTx = async (
   txHash: string,
   chainId: ChainID,
-  protocol: ProtocolType = 'pancake'
+  protocol: ProtocolType = "pancake"
 ) => {
   try {
     const provider = _getProvider(chainId);
 
-    await provider.waitForTransaction(txHash);
+    await provider.waitForTransaction(txHash, 2);
     const receipt = await provider.getTransactionReceipt(txHash);
     if (!receipt) throw new BadRequestError(`receipt not found for ${txHash}`);
 
-    const config = getContractConfig(protocol, chainId);
-    if (config.validateTo && receipt.to?.toLowerCase() !== config.validateTo.toLowerCase()) {
-      throw new BadRequestError(`txHash not from expected contract`);
-    }
+    const config = getContractConfig(protocol, 56);
 
     const block = await provider.getBlock(receipt.blockNumber);
     if (!block) throw new BadRequestError(`block not found for ${txHash}`);
@@ -82,27 +85,35 @@ export const getTokenDetailsFromCreateTx = async (
       throw new BadRequestError(`tx is more than 1 Hr old`);
     }
 
-    const matchingLogs = receipt.logs.filter(log => log.topics[0] === config.topic);
+    const matchingLogs = receipt.logs.filter(
+      (log) => log.topics[0] === config.topic
+    );
 
     let event = null;
-    if (protocol === 'pancake') {
+    if (protocol === "pancake") {
       const poolInterface = new ethers.Interface(PoolABI);
       const parsedEvents = matchingLogs
         .map((log, index) => {
           try {
             const parsed = poolInterface.parseLog(log);
-            console.log(`Log ${index} parsed with Pool ABI:`, parsed?.name, parsed?.args);
+            console.log(
+              `Log ${index} parsed with Pool ABI:`,
+              parsed?.name,
+              parsed?.args
+            );
             return parsed;
           } catch (error) {
             console.log(`Log ${index} parse error with Pool ABI:`, error);
             return null;
           }
         })
-        .filter(parsed => parsed !== null && parsed.name === config.eventName);
+        .filter(
+          (parsed) => parsed !== null && parsed.name === config.eventName
+        );
 
       if (parsedEvents.length > 0) {
         event = parsedEvents[0];
-        console.log('Found PoolCreated event:', event?.args);
+        console.log("Found PoolCreated event:", event?.args);
       }
     } else {
       const contract = getContract(config, provider);
@@ -116,7 +127,9 @@ export const getTokenDetailsFromCreateTx = async (
             return null;
           }
         })
-        .filter(parsed => parsed !== null && parsed.name === config.eventName);
+        .filter(
+          (parsed) => parsed !== null && parsed.name === config.eventName
+        );
 
       if (parsedEvents.length > 0) {
         event = parsedEvents[0];
@@ -124,15 +137,17 @@ export const getTokenDetailsFromCreateTx = async (
     }
 
     if (!event) {
-      throw new BadRequestError(`${config.eventName} event not found in transaction`);
+      throw new BadRequestError(
+        `${config.eventName} event not found in transaction`
+      );
     }
 
-    if (protocol === 'pancake') {
+    if (protocol === "pancake") {
       const token0 = (event.args[0] as string).toLowerCase();
       const token1 = (event.args[1] as string).toLowerCase();
       const pool = (event.args[4] as string).toLowerCase();
 
-      console.log('PoolCreated event args:', {
+      console.log("PoolCreated event args:", {
         token0,
         token1,
         fee: event.args[2],
@@ -142,18 +157,20 @@ export const getTokenDetailsFromCreateTx = async (
       return {
         token: token0,
         pool: pool,
-        dex: 'pancake',
+        dex: "pancake",
       };
     }
 
     return {
       token: event.args.token.toLowerCase(),
       creator: event.args.creator.toLowerCase(),
-      dex: 'fourmeme',
+      dex: "fourmeme",
     };
   } catch (error) {
     console.log(error);
-    throw new BadRequestError(`Error fetching receipt or parsing logs: ${error}`);
+    throw new BadRequestError(
+      `Error fetching receipt or parsing logs: ${error}`
+    );
   }
 };
 
@@ -163,9 +180,13 @@ export const getTokenDetailsFromCreateTx = async (
  * @param chainId - The chain id
  * @returns The pool details
  */
-export const getPoolDetailsFromCreateTx = async (txHash: string, chainId: ChainID) => {
-  const result = await getTokenDetailsFromCreateTx(txHash, chainId, 'pancake');
-  if (!result.pool || !result.dex) throw new BadRequestError('Pool details not found');
+export const getPoolDetailsFromCreateTx = async (
+  txHash: string,
+  chainId: ChainID
+) => {
+  const result = await getTokenDetailsFromCreateTx(txHash, chainId, "pancake");
+  if (!result.pool || !result.dex)
+    throw new BadRequestError("Pool details not found");
   return result;
 };
 
@@ -175,9 +196,13 @@ export const getPoolDetailsFromCreateTx = async (txHash: string, chainId: ChainI
  * @param chainId - The chain id
  * @returns The token address and creator
  */
-export const getFourMemeTokenDetailsFromTx = async (txHash: string, chainId: ChainID) => {
-  const result = await getTokenDetailsFromCreateTx(txHash, chainId, 'fourmeme');
-  if (!result.creator) throw new BadRequestError('Creator not found in transaction');
+export const getFourMemeTokenDetailsFromTx = async (
+  txHash: string,
+  chainId: ChainID
+) => {
+  const result = await getTokenDetailsFromCreateTx(txHash, 56, "fourmeme");
+  if (!result.creator)
+    throw new BadRequestError("Creator not found in transaction");
   return result;
 };
 
@@ -187,17 +212,23 @@ export const getFourMemeTokenDetailsFromTx = async (txHash: string, chainId: Cha
  * @param chainId - The chain id
  * @returns The token info from TokenManagerV2
  */
-export const getTokenInfoFromTokenManagerV2 = async (tokenAddress: string, chainId: ChainID) => {
+export const getTokenInfoFromTokenManagerV2 = async (
+  tokenAddress: string,
+  chainId: ChainID
+) => {
   try {
     const provider = _getProvider(chainId);
-    const addr = nconf.get('TOKEN_MANAGER_V2_ADDRESS_BSC');
-    if (!addr) throw new BadRequestError('TokenManagerV2 address not configured');
+    const addr = nconf.get("TOKEN_MANAGER_V2_ADDRESS_BSC");
+    if (!addr)
+      throw new BadRequestError("TokenManagerV2 address not configured");
 
     const c = new ethers.Contract(addr, TokenManagerV2ABI, provider);
     return await c._tokenInfos(tokenAddress);
   } catch (error) {
     console.log(error);
-    throw new BadRequestError(`Error reading token info from TokenManagerV2: ${error}`);
+    throw new BadRequestError(
+      `Error reading token info from TokenManagerV2: ${error}`
+    );
   }
 };
 
@@ -207,10 +238,13 @@ export const getTokenInfoFromTokenManagerV2 = async (tokenAddress: string, chain
  * @param chainId - The chain id
  * @returns The token decimals and symbol
  */
-export const getERC20TokenDetails = async (tokenAddress: string, chainId: ChainID) => {
+export const getERC20TokenDetails = async (
+  tokenAddress: string,
+  chainId: ChainID
+) => {
   try {
     if (tokenAddress.toLowerCase() === blackListedTokens[0]) {
-      return { decimals: 18, symbol: 'BNB' };
+      return { decimals: 18, symbol: "BNB" };
     }
 
     const provider = _getProvider(chainId);
