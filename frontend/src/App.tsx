@@ -4,7 +4,7 @@ import { Providers } from './lib/providers'
 import Layout from './components/Layout'
 import Lab from './pages/Lab'
 import Traders from './pages/Traders'
-import CreateAgent from './pages/CreateAgent'
+import Create from './pages/Create'
 import GenomeViewer from './pages/GenomeViewer'
 import AgentDashboard from './pages/AgentDashboard'
 import EvolutionTree from './pages/EvolutionTree'
@@ -19,7 +19,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Lab />} />
             <Route path="/traders" element={<Traders />} />
-            <Route path="/create" element={<CreateAgent />} />
+            <Route path="/create" element={<Create />} />
             <Route path="/genome/:id" element={<GenomeViewer />} />
             <Route path="/agent/:id" element={<AgentDashboard />} />
             <Route path="/evolution/:id" element={<EvolutionTree />} />
