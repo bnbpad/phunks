@@ -1,11 +1,8 @@
 import { Tokens, IToken } from "../../database/token";
 import { Views } from "../../database/views";
-import { getTokenHolding } from "../../subgraph";
 import { blackListedTokens, BNBPAD_PRICE } from "../../utils/constant";
 import { ITokenData } from "./types";
 import { BadRequestError, NotFoundError } from "../../errors";
-import { TokenHoldingParams } from "../../subgraph/types";
-import { getTokenLike } from "./likes";
 
 /**
  * Get the details of a token
@@ -25,14 +22,7 @@ export const getToken = async (tokenAddress: string, chainId: string) => {
   if (!TokenDetails) throw new NotFoundError("Token not found");
 
   let fetchedData: ITokenData | null = null;
-  if (TokenDetails.dex === "fourmeme") {
-    fetchedData = await _getDefaultTokenData(TokenDetails);
-  } else {
-    fetchedData = await fetchTokenData(formattedAddress, chainId);
-    if (!fetchedData) {
-      fetchedData = await _getDefaultTokenData(TokenDetails);
-    }
-  }
+  fetchedData = await _getDefaultTokenData(TokenDetails);
 
   const {
     tokenData,
@@ -49,7 +39,6 @@ export const getToken = async (tokenAddress: string, chainId: string) => {
     { upsert: true, new: true }
   );
 
-  const likes = await getTokenLike(tokenAddress.toLowerCase().trim());
   const createdAt = TokenDetails.createdAt
     ? Math.floor(new Date(TokenDetails.createdAt).getTime() / 1000)
     : 0;
@@ -68,7 +57,7 @@ export const getToken = async (tokenAddress: string, chainId: string) => {
     holderCount: tokenData.holderCount,
     views: view.views,
     createdAt,
-    likes,
+    likes: [],
     pool: {
       token0: pool.token0,
       token1: pool.token1,
@@ -77,77 +66,6 @@ export const getToken = async (tokenAddress: string, chainId: string) => {
       pool: pool.pool,
       totalFTVolume: pool.totalNothVolume,
     },
-  };
-};
-
-/**
- * Fetch the token data from the subgraph
- * @param tokenAddress - The address of the token
- * @param chainId - The chain ID of the token
- * @returns The token data
- */
-export const fetchTokenData = async (
-  tokenAddress: string,
-  chainId: string
-): Promise<ITokenData | null> => {
-  const params: TokenHoldingParams = {
-    formattedAddress: tokenAddress.toLowerCase(),
-    blacklistedTokens: blackListedTokens.map((token) => token.toLowerCase()),
-  };
-
-  const tokenData = await getTokenHolding(chainId, params);
-  if (!tokenData || tokenData.length === 0) return null;
-
-  const token = tokenData[0];
-  const pool = token.pool || {
-    pool: "",
-    token0: token.id,
-    token1: token.fundingToken,
-    fee: 0,
-    tickSpacing: 0,
-    totalFTVolume: "0",
-  };
-  const totalSupply = Number(token.totalSupply) / 1e18;
-  const token1Price = BNBPAD_PRICE;
-  const marketCapInUSD = token1Price * totalSupply;
-  const basePrice = 0;
-  const totalFTVolume = Number(pool?.totalNothVolume || "0") / 1e18;
-  const totalFTVolumeUsd = totalFTVolume * token1Price;
-
-  const tokenDataFromDb = await Tokens.findOne({
-    "basicDetails.address": tokenAddress.toLowerCase(),
-  }).select("basicDetails tokenomics links walletAddress pool");
-
-  const basicDetails = tokenDataFromDb?.basicDetails || {
-    name: token.name,
-    symbol: token.symbol,
-    desc: "No description available",
-    image: "",
-    chainId: null,
-    chainType: "",
-  };
-
-  const tokenomics = tokenDataFromDb?.tokenomics || {};
-
-  const links = tokenDataFromDb?.links || {
-    creatorLink: "",
-    launchTweetLink: "",
-    discordLink: "",
-    twitterLink: "",
-    telegramLink: "",
-    websiteLink: "",
-    twitchLink: "",
-  };
-  return {
-    tokenData: token,
-    basicDetails,
-    tokenomics,
-    links,
-    marketCapInUSD,
-    basePrice,
-    totalFTVolume,
-    totalFTVolumeUsd,
-    pool,
   };
 };
 
