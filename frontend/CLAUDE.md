@@ -134,8 +134,9 @@ This is a hackathon-quality AI agent platform that emphasizes professionalism, B
 ### Git Commit Guidelines
 - When committing code changes, use clean, descriptive commit messages
 - Focus on what was changed and why
-- Do not include co-author attributions unless specifically requested
+- **Do NOT include Claude co-author attribution** - commits should only be from the actual human developer
 - Keep commits focused and atomic
+- When asked to commit, create a clean commit without any automated co-author tags
 
 ### Commit Message Format
 ```bash
@@ -143,6 +144,8 @@ git commit -m "Brief description of changes
 
 Optional longer description if needed for complex changes"
 ```
+
+**Note**: Avoid adding co-author attributions like "Co-Authored-By: Claude" unless explicitly requested by the developer.
 
 ## 🌐 Internationalization
 
