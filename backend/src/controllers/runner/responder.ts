@@ -5,7 +5,7 @@ import { ChainID } from "../../utils/constant";
 import { _getProvider } from "../../utils/contract";
 
 // Contract configuration
-const CONTRACT_ADDRESS = "0xe92849209dd2e0f9b328279e17e8d53e1948379a";
+const CONTRACT_ADDRESS = "0x10c0043Dcd70054E8f040fa199FD5B3Ed2Dbb7A3";
 const CHAIN_ID: ChainID = 56; // BSC Mainnet
 
 // Response options

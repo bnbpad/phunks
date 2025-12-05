@@ -1,10 +1,12 @@
 import { AgentActionRequestHandler, AgentRunner } from "./listener";
+import { AgentResponder } from "./responder";
 
 const run = async () => {
-  const runner = new AgentRunner();
+  const runner = new AgentRunner(500);
+  const responder = new AgentResponder();
 
   // Define event handler (can be sync or async)
-  const handler: AgentActionRequestHandler = (event) => {
+  const handler: AgentActionRequestHandler = async (event) => {
     // Your custom logic here - runs synchronously
     console.log("Processing AgentActionRequest:", {
       hash: event.hash,
@@ -12,7 +14,28 @@ const run = async () => {
       actionId: event.actionId.toString(),
     });
 
-    // process agent request and return answer
+    try {
+      if (event.actionId.toString() == "1") {
+        // perform upgrade
+        const tx = await responder.respondWithUpgrade({
+          hash: event.hash,
+          memory:
+            "Agent has learned to trade more effectively based on market conditions.",
+        });
+        console.log("Upgrade transaction:", tx.hash);
+      } else if (event.actionId.toString() == "0") {
+        // perform action
+        const tx = await responder.respondWithAction({
+          hash: event.hash,
+          to: "0xA1a629d832972DB3b84A4f5Fa42d50eFF7c8F8dE",
+          data: "0x",
+          value: "0",
+        });
+        console.log("Action transaction:", tx.hash);
+      }
+    } catch (error) {
+      console.error("❌ Error processing AgentActionRequest:", error);
+    }
   };
 
   // Start listening

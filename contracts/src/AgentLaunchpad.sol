@@ -48,6 +48,8 @@ contract AgentLaunchpad is Initializable, OwnableUpgradeable {
     mapping(bytes32 => AgentRequest) public requests;
     mapping(bytes32 => string) public goals;
     mapping(bytes32 => string) public memories;
+    mapping(address => bool) public isAgent;
+    mapping(address => address) public tokenToAgent;
 
     mapping(uint256 => AgentInformation) public agentInformation;
 
@@ -73,19 +75,24 @@ contract AgentLaunchpad is Initializable, OwnableUpgradeable {
         string memory brainMemory,
         string memory persona,
         string memory experience
-    ) public {
+    ) public returns (address agent) {
         string memory metadataURI = "";
         IAgentNFT.AgentMetadata memory metadata = IAgentNFT.AgentMetadata(persona, experience, "", "", "", "");
 
         // create the logic contract for the agent
         address logicAddress = address(new Agent(address(this)));
+        isAgent[logicAddress] = true;
+        tokenToAgent[fourToken] = logicAddress;
 
         uint256 tokenId = IAgentNFT(agentNFT).createAgent(msg.sender, logicAddress, metadataURI, metadata);
         agentInformation[tokenId] = AgentInformation(msg.sender, fourToken, goal, brainMemory);
         emit AgentCreated(tokenId, msg.sender, logicAddress, metadataURI);
+
+        agent = logicAddress;
     }
 
     function sendRequest(address agent, uint256 actionId) public {
+        require(isAgent[agent], "Agent not found");
         bytes32 hash = keccak256(abi.encode(agent, actionId, block.timestamp));
         requests[hash] = AgentRequest(agent, 1, actionId);
         _pendingTxs.add(hash);

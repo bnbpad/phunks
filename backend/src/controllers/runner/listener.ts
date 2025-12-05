@@ -4,7 +4,7 @@ import { ChainID } from "../../utils/constant";
 import { _getProvider } from "../../utils/contract";
 
 // Contract configuration
-const CONTRACT_ADDRESS = "0xe92849209dd2e0f9b328279e17e8d53e1948379a";
+const CONTRACT_ADDRESS = "0x10c0043Dcd70054E8f040fa199FD5B3Ed2Dbb7A3";
 const CHAIN_ID: ChainID = 56; // BSC Mainnet
 
 // Event interface matching AgentActionRequest
@@ -83,14 +83,6 @@ export class AgentRunner {
           transactionHash: "", // Not available from getPendingTxs
           blockHash: blockHash,
         };
-
-        console.log("\n🎉 New AgentActionRequest Detected!");
-        console.log("Hash:", eventData.hash);
-        console.log("Agent Address:", eventData.agentAddress);
-        console.log("Action ID:", eventData.actionId.toString());
-        console.log("Block Number:", eventData.blockNumber);
-        console.log("---\n");
-
         // Mark as processed
         this.processedHashes.add(hashString);
 
