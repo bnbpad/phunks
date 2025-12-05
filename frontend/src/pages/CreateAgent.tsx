@@ -1,5 +1,11 @@
 import React, { useState } from 'react'
-import { Cpu, Brain, Target, Shield, Sparkles, ArrowRight, Upload } from 'lucide-react'
+import { Cpu, Brain, Target, Shield, Sparkles, ArrowRight, Upload, Wallet, AlertTriangle } from 'lucide-react'
+import { ConnectWallet } from '../components/ConnectWallet'
+import { BalanceDisplay } from '../components/BalanceDisplay'
+import { useWallet } from '../lib/hooks/useWallet'
+import { useTokenTransaction } from '../lib/hooks/useTokenTransaction'
+import { useWalletError, formatWalletError } from '../lib/hooks/useWalletError'
+import config from '../lib/config'
 
 const CreateAgent = () => {
   const [step, setStep] = useState(1)
@@ -13,6 +19,46 @@ const CreateAgent = () => {
     agentStyle: 'scalping',
     maxPosition: 25,
   })
+
+  // Wallet hooks
+  const [walletState, walletActions] = useWallet()
+  const [transactionState, transactionActions] = useTokenTransaction()
+  const [errorState, errorActions] = useWalletError()
+
+  // Deploy function
+  const handleDeploy = async () => {
+    if (!walletState.isConnected || !walletState.isCorrectNetwork) {
+      errorActions.setError({
+        type: 'connection',
+        message: 'Please connect wallet and switch to BSC network'
+      })
+      return
+    }
+
+    try {
+      errorActions.clearError()
+
+      // This would call the actual contract deployment
+      // For now, just simulate the transaction
+      await transactionActions.writeContract({
+        abi: [], // Contract ABI would go here
+        address: config.contracts.agentNFT as `0x${string}`,
+        functionName: 'createAgent',
+        args: [
+          formData.name,
+          formData.symbol,
+          formData.description,
+          formData.strategy,
+          formData.riskTolerance,
+          formData.agentStyle,
+          formData.maxPosition
+        ],
+        value: 0n // No ETH value required for this transaction
+      })
+    } catch (error) {
+      errorActions.setError(formatWalletError(error))
+    }
+  }
 
   const strategies = [
     { id: 'conservative', name: 'Conservative', description: 'Low risk, steady growth with capital preservation' },
@@ -72,6 +118,48 @@ const CreateAgent = () => {
             </React.Fragment>
           )
         })}
+      </div>
+
+      {/* Wallet Connection */}
+      <div className="grid lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2">
+          <div className="bg-white card-shadow rounded-xl p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-orbitron font-bold text-gray-900">Wallet Connection</h3>
+              <ConnectWallet />
+            </div>
+
+            {errorState.hasError && (
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 text-red-600" />
+                  <span className="text-red-700 text-sm font-exo">
+                    {errorState.currentError?.message}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {!walletState.isConnected && (
+              <div className="text-center py-8">
+                <Wallet className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-600 font-exo">Connect your wallet to create AI agents</p>
+              </div>
+            )}
+
+            {walletState.isConnected && !walletState.isCorrectNetwork && (
+              <div className="text-center py-8">
+                <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+                <p className="text-red-600 font-exo mb-4">Wrong network detected</p>
+                <p className="text-gray-600 font-exo">Please switch to BNB Smart Chain (BSC)</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="lg:col-span-1">
+          {walletState.isConnected && walletState.isCorrectNetwork && <BalanceDisplay />}
+        </div>
       </div>
 
       {/* Form Content */}
@@ -270,6 +358,72 @@ const CreateAgent = () => {
                 </div>
               </div>
             </div>
+
+            {/* Transaction Progress */}
+            {transactionState.isPending && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                    <span className="text-blue-800 font-exo font-medium">
+                      {transactionState.currentStep}
+                    </span>
+                  </div>
+                  <div className="w-full bg-blue-200 rounded-full h-2">
+                    <div
+                      className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${transactionState.progress}%` }}
+                    ></div>
+                  </div>
+                  {transactionState.hash && (
+                    <div className="text-sm text-blue-700 font-exo">
+                      Transaction: {transactionState.hash.slice(0, 10)}...{transactionState.hash.slice(-8)}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Success State */}
+            {transactionState.isConfirmed && (
+              <div className="bg-green-50 border border-green-200 rounded-lg p-6">
+                <div className="text-center space-y-3">
+                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+                    <Sparkles className="w-8 h-8 text-green-600" />
+                  </div>
+                  <h3 className="text-lg font-orbitron font-bold text-green-900">
+                    Agent Deployed Successfully!
+                  </h3>
+                  <p className="text-green-700 font-exo">
+                    Your AI agent has been deployed to BSC and is ready to start trading
+                  </p>
+                  {transactionState.hash && (
+                    <a
+                      href={`${config.network.blockExplorer}/tx/${transactionState.hash}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-green-600 hover:text-green-800 font-exo text-sm transition-colors"
+                    >
+                      View on BSCScan
+                      <ArrowRight className="w-4 h-4" />
+                    </a>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Error State */}
+            {transactionState.error && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+                <div className="flex items-center gap-3 text-red-800">
+                  <AlertTriangle className="w-6 h-6" />
+                  <div>
+                    <h4 className="font-exo font-medium">Transaction Failed</h4>
+                    <p className="text-sm font-exo mt-1">{transactionState.error}</p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -293,9 +447,22 @@ const CreateAgent = () => {
               <ArrowRight className="w-5 h-5" />
             </button>
           ) : (
-            <button className="ml-auto flex items-center gap-2 px-8 py-4 bsc-gradient rounded-lg font-exo font-semibold text-lg text-white hover:opacity-90 transition-opacity">
-              <Sparkles className="w-6 h-6" />
-              Deploy Strategy
+            <button
+              onClick={handleDeploy}
+              disabled={!walletState.isConnected || !walletState.isCorrectNetwork || transactionState.isPending}
+              className="ml-auto flex items-center gap-2 px-8 py-4 bsc-gradient rounded-lg font-exo font-semibold text-lg text-white hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {transactionState.isPending ? (
+                <>
+                  <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Deploying...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-6 h-6" />
+                  Deploy Strategy
+                </>
+              )}
             </button>
           )}
         </div>

@@ -4,6 +4,7 @@ import { Activity, TrendingUp, TrendingDown, Zap, Shield, Clock, DollarSign, Bar
 import { useTranslation } from 'react-i18next'
 import ActivityEvolutionChanges from '../components/ActivityEvolutionChanges'
 import EvolutionChangesModal from '../components/EvolutionChangesModal'
+import SimplifiedRecentTrades from '../components/RecentTrades'
 
 const AgentDashboard = () => {
   const { id } = useParams()
@@ -39,7 +40,11 @@ const AgentDashboard = () => {
     currentPrice: '$256.89',
     unrealizedPnL: '+4.74%',
     description: t('agent.description'),
-    image: '/avatars/avatar1.png'
+    image: '/avatars/avatar1.png',
+    goals: 'Achieve consistent 15%+ monthly returns through diversified DeFi strategies. Maintain risk exposure below 60% of total portfolio value. Build expertise in yield farming and liquidity provision on BSC. Develop advanced market timing algorithms for optimal entry/exit points.',
+    memory: 'Successfully navigated the May 2024 market correction by reducing exposure 48 hours before the crash. Learned that CAKE staking during weekends typically yields 12% higher returns due to reduced competition. Discovered correlation between BNB price movements and overall BSC ecosystem performance. Identified optimal gas fee timing: early morning UTC shows 23% lower transaction costs.',
+    personal: 'Risk Tolerance: Medium-High. Trading Style: Quantitative Analysis with Momentum Trading. Preferred Assets: BNB, CAKE, USDT, ETH. Operating Hours: 24/7 with peak activity during Asian and European markets. Decision Making: Data-driven with 87% confidence threshold for trade execution.',
+    experiences: 'First Major Win (March 2024): Achieved 340% gains during the Q1 2024 DeFi boom by early positioning in emerging yield farms. Impact: Established core momentum trading strategy. Market Crash Navigation (May 2024): Preserved 94% of portfolio value during May 2024 correction through predictive risk management. Impact: Refined stop-loss algorithms and market sentiment analysis. Cross-Chain Integration (August 2024): Successfully implemented multi-chain arbitrage strategies across BSC, Ethereum, and Polygon. Impact: Expanded trading universe and reduced correlation risks.'
   }
 
   const recentTrades = [
@@ -100,10 +105,12 @@ const AgentDashboard = () => {
       description: t('ai.activities.evolutionCycleInitiated.description'),
       type: 'evolution',
       impact: t('ai.impact.high'),
-      metrics: { winRate: '+0.3%', efficiency: '+12%' },
+      metrics: {},
       status: 'active',
       evolutionChanges: evolutionChangesData[1]
-    },
+    }
+    // TODO: Add back other AI activity types later
+    /*
     {
       id: 2,
       time: '14:35:39',
@@ -175,6 +182,7 @@ const AgentDashboard = () => {
       metrics: { momentum: '+5.2%', timeframe: '15min' },
       status: 'processed'
     }
+    */
   ]
 
   return (
@@ -192,7 +200,7 @@ const AgentDashboard = () => {
       <div className="bg-white card-shadow rounded-xl p-8">
         <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
           <div className="flex items-start gap-4">
-            <div className="w-16 h-16 rounded-xl overflow-hidden bg-gray-100">
+            <div className="w-28 h-28 rounded-xl overflow-hidden bg-gray-100">
               <img src={agentData.image} alt={agentData.name} className="w-full h-full object-cover" />
             </div>
             <div>
@@ -210,13 +218,14 @@ const AgentDashboard = () => {
         </div>
       </div>
 
-      {/* Two Column Layout - Trades & AI Activity */}
-      <div className="grid lg:grid-cols-2 gap-8 lg:items-start">
-        {/* Trades & Positions */}
+      {/* Two Column Layout - AI Activity & Trades */}
+      <div className="grid lg:grid-cols-[70%,30%] gap-8 lg:items-start">
+        {/* TODO: Remove complex trades & positions section later */}
+        {/*
         <div className="bg-white card-shadow rounded-xl p-6 h-fit">
           <h2 className="text-2xl font-orbitron font-bold text-gray-900 mb-4">{t('trades.title')}</h2>
 
-          {/* Embedded Stats */}
+          Embedded Stats
           <div className="bg-gray-50 rounded-xl p-4 mb-6">
             <div className="grid grid-cols-4 gap-3">
               <div className="text-center">
@@ -355,6 +364,7 @@ const AgentDashboard = () => {
             ))}
           </div>
         </div>
+        */}
 
         {/* AI Evolution & Activity */}
         <div className="bg-white card-shadow rounded-xl p-6 h-fit">
@@ -440,21 +450,23 @@ const AgentDashboard = () => {
 
                 <p className="text-sm text-gray-600 font-exo mb-3">{activity.description}</p>
 
-                {/* Metrics Grid */}
-                <div className="grid grid-cols-2 gap-3 text-xs">
-                  {Object.entries(activity.metrics).map(([key, value]) => (
-                    <div key={key} className="bg-white rounded-lg p-2">
-                      <span className="text-gray-500 font-exo capitalize">{key}</span>
-                      <p className={`font-semibold font-exo ${
-                        value.toString().includes('+') ? 'text-green-600' :
-                        value.toString().includes('-') ? 'text-red-600' :
-                        'text-gray-900'
-                      }`}>
-                        {value}
-                      </p>
-                    </div>
-                  ))}
-                </div>
+                {/* Metrics Grid - Only show if there are metrics */}
+                {Object.keys(activity.metrics).length > 0 && (
+                  <div className="grid grid-cols-2 gap-3 text-xs">
+                    {Object.entries(activity.metrics).map(([key, value]) => (
+                      <div key={key} className="bg-white rounded-lg p-2">
+                        <span className="text-gray-500 font-exo capitalize">{key}</span>
+                        <p className={`font-semibold font-exo ${
+                          value.toString().includes('+') ? 'text-green-600' :
+                          value.toString().includes('-') ? 'text-red-600' :
+                          'text-gray-900'
+                        }`}>
+                          {value}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
 
                 {/* Evolution Changes - Only for evolution type activities */}
                 {activity.type === 'evolution' && activity.evolutionChanges && (
@@ -480,9 +492,64 @@ const AgentDashboard = () => {
           </div>
         </div>
 
+        {/* Recent Trades */}
+        <SimplifiedRecentTrades />
+
       </div>
 
-      {/* BSC Network Info */}
+      {/* Agent Profile Sections */}
+      <div className="grid lg:grid-cols-2 gap-8">
+        {/* Goals */}
+        <div className="bg-white card-shadow rounded-xl p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-2 h-8 bg-purple-500 rounded-full"></div>
+            <h3 className="text-xl font-orbitron font-bold text-gray-900">Goals</h3>
+          </div>
+          <div className="bg-purple-50 rounded-lg p-4">
+            <p className="text-sm font-exo text-gray-800 leading-relaxed whitespace-pre-line">{agentData.goals}</p>
+          </div>
+        </div>
+
+        {/* Memory */}
+        <div className="bg-white card-shadow rounded-xl p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-2 h-8 bg-blue-500 rounded-full"></div>
+            <h3 className="text-xl font-orbitron font-bold text-gray-900">Memory</h3>
+          </div>
+          <div className="bg-blue-50 rounded-lg p-4">
+            <p className="text-sm font-exo text-gray-800 leading-relaxed whitespace-pre-line">{agentData.memory}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Personal & Experiences */}
+      <div className="grid lg:grid-cols-2 gap-8">
+        {/* Personal */}
+        <div className="bg-white card-shadow rounded-xl p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-2 h-8 bg-green-500 rounded-full"></div>
+            <h3 className="text-xl font-orbitron font-bold text-gray-900">Personal Profile</h3>
+          </div>
+          <div className="bg-green-50 rounded-lg p-4">
+            <p className="text-sm font-exo text-gray-800 leading-relaxed whitespace-pre-line">{agentData.personal}</p>
+          </div>
+        </div>
+
+        {/* Experiences */}
+        <div className="bg-white card-shadow rounded-xl p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-2 h-8 bg-bsc-500 rounded-full"></div>
+            <h3 className="text-xl font-orbitron font-bold text-gray-900">Key Experiences</h3>
+          </div>
+          <div className="bg-bsc-50 rounded-lg p-4">
+            <p className="text-sm font-exo text-gray-800 leading-relaxed whitespace-pre-line">{agentData.experiences}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* TODO: Add back BSC Network Benefits section later */}
+      {/*
+      BSC Network Info
       <div className="bg-bsc-50 rounded-xl p-8">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-8 h-8 bg-bsc-500 diamond-shape"></div>
@@ -507,6 +574,7 @@ const AgentDashboard = () => {
           </div>
         </div>
       </div>
+      */}
 
       {/* Evolution Changes Modal */}
       {selectedEvolutionData && (

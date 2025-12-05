@@ -1,5 +1,4 @@
 import * as http from "http";
-import path from "path";
 
 import bodyParser from "body-parser";
 import cors from "cors";
@@ -7,7 +6,6 @@ import express from "express";
 import { Server } from "socket.io";
 import { router } from "./routes";
 
-import socketHandler from "./socket";
 import nconf from "./config/nconf";
 import { errorHandler } from "./middlewares/errorHandler";
 
@@ -20,8 +18,6 @@ export const io = new Server(server, {
     credentials: true,
   },
 });
-
-socketHandler(io);
 
 app.use(cors());
 app.use(bodyParser.json());

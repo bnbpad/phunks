@@ -1,10 +1,10 @@
-import { Router } from 'express';
+import { Router } from "express";
 
-import token from './token';
-import user from './user';
-import ai from './ai';
+import token from "./token";
+import ai from "./ai";
+import aiDecisions from "./aiDecisions";
 export const router = Router();
-router.get('/', (_req, res) => {
+router.get("/", (_req, res) => {
   res.json({
     uptime: process.uptime(),
     online: true,
@@ -12,8 +12,8 @@ router.get('/', (_req, res) => {
   });
 });
 
-router.use('/user', user);
-router.use('/token', token);
+router.use("/token", token);
 
-router.use('/ai', ai);
+router.use("/ai", ai);
+router.use("/aiDecisions", aiDecisions);
 export default router;

@@ -1,8 +1,6 @@
-import { authenticate } from '../middlewares/authenticate';
-import { Balance, MarketAnalysis } from '../controllers/ai-models/OpenAIDecisionEngine';
-import { Router } from 'express';
-import rateLimit from 'express-rate-limit';
-import { rateLimitWindowAI, totalRequestsIPAI } from '../utils/constant';
+import { Router } from "express";
+import rateLimit from "express-rate-limit";
+import { rateLimitWindowAI, totalRequestsIPAI } from "../utils/constant";
 
 const router = Router();
 const ipLimiterAI = rateLimit({
@@ -10,7 +8,7 @@ const ipLimiterAI = rateLimit({
   max: totalRequestsIPAI,
   message: {
     success: false,
-    message: 'Too many requests from this IP, please try again after an hour',
+    message: "Too many requests from this IP, please try again after an hour",
   },
 });
 /**
