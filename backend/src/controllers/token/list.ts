@@ -3,7 +3,6 @@ import { BadRequestError } from "../../errors";
 import { listTokens } from "../../subgraph";
 import { blackListedTokens, BNBPAD_PRICE } from "../../utils/constant";
 import { ListTokensParams } from "../../subgraph/types";
-import { getTokenLike } from "./likes";
 
 export type SortOption =
   | "marketCap"
@@ -151,7 +150,6 @@ export const getTokensDetail = async (
         (Number(token.totalSupply) / 1e18) * (BNBPAD_PRICE || 0);
       const basePrice = 0;
 
-      const likes = await getTokenLike(basicDetails?.address || "");
       return {
         dex: tokenFromDb?.dex || "pancake",
         basicDetails,
@@ -164,7 +162,7 @@ export const getTokensDetail = async (
         createdAt: tokenFromDb?.createdAt
           ? Math.floor(new Date(tokenFromDb?.createdAt).getTime() / 1000)
           : 0,
-        likes,
+        likes: [],
       };
     })
   );
@@ -178,7 +176,6 @@ export const getTokensDetail = async (
     bnbpadTokensNotInSubgraph.map(async (token) => {
       const basicDetails = token.basicDetails;
 
-      const likes = await getTokenLike(basicDetails.address);
       return {
         dex: token.dex || "pancake",
         basicDetails,
@@ -191,7 +188,7 @@ export const getTokensDetail = async (
         createdAt: token.createdAt
           ? Math.floor(new Date(token.createdAt).getTime() / 1000)
           : 0,
-        likes,
+        likes: [],
       };
     })
   );
@@ -200,7 +197,6 @@ export const getTokensDetail = async (
     fourmemeTokens.map(async (token) => {
       const basicDetails = token.basicDetails;
 
-      const likes = await getTokenLike(basicDetails.address);
       return {
         dex: token.dex || "fourmeme",
         basicDetails,
@@ -213,7 +209,7 @@ export const getTokensDetail = async (
         createdAt: token.createdAt
           ? Math.floor(new Date(token.createdAt).getTime() / 1000)
           : 0,
-        likes,
+        likes: [],
       };
     })
   );
