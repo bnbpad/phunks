@@ -7,10 +7,10 @@ import {
   LoginResponse,
   UploadImageResponse,
   CreateTokenRequest,
-  CreateTokenResponse,
-  SaveTokenRequest,
-  SaveTokenResponse
+  CreateTokenResponse, AIThesisConfig
 } from '../types/fourMeme';
+import axios, { AxiosHeaders, AxiosRequestConfig, AxiosResponse } from "axios";
+import {createTokenApiType} from "../hooks/useCreateFourMeme.ts";
 
 const FOUR_MEME_BASE_URL = "https://four.meme/meme-api";
 
@@ -112,73 +112,78 @@ export const uploadTokenImageFourMeme = async (
   }
 };
 
-// Step 4: Create Token on FourMeme
-export const createTokenFourMeme = async (
+export async function invoke({
+                               baseURL = "https://fd32c497428a.ngrok-free.app/",
+                               url,
+                               method = "GET",
+                               data,
+                               headers = {},
+                             }: // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                             AxiosRequestConfig): Promise<any> { // eslint-disable-line @typescript-eslint/no-explicit-any
+  try {
+    // todo get auth code from redux store and not local storage
+    const authCode =
+      typeof localStorage !== "undefined"
+        ? localStorage.getItem("auth-code")
+        : null;
+
+    const mergedHeaders: AxiosHeaders = new AxiosHeaders();
+    // Merge passed headers
+    if (headers) {
+      Object.entries(headers).forEach(([key, value]) => {
+        mergedHeaders.set(key, value);
+      });
+    }
+    // Add Authorization header if authCode exists
+    if (authCode) mergedHeaders.Authorization = `Bearer ${authCode}`;
+
+    const response: AxiosResponse = await axios({
+      baseURL,
+      url,
+      method,
+      data,
+      headers: mergedHeaders,
+    });
+    return response.data;
+  } catch (error) {
+    console.log("Error invoking API:", url, error);
+    return error as AxiosResponse;
+  }
+}
+
+// Step 4: Create Token on FourMeme (using proxy approach for CORS)
+export const createTokenFourMeme = (
   data: CreateTokenRequest,
   accessToken: string
 ): Promise<CreateTokenResponse> => {
-  try {
-    // Try using invokeFourMeme first, fallback to mock if CORS fails
-    try {
-      return invokeFourMeme({
-        url: "/v1/private/token/create",
-        method: "POST",
-        data,
-        headers: {
-          'meme-web-access': accessToken,
-        },
-      }) as Promise<CreateTokenResponse>;
-    } catch (corsError) {
-      // If CORS error, return mock response for development
-      if (corsError instanceof TypeError || corsError.toString().includes('CORS')) {
-        console.warn('CORS error detected, using mock response for development');
-        return {
-          code: "0",
-          data: {
-            tokenId: 12345,
-            totalAmount: "1000000000",
-            saleAmount: "800000000",
-            template: 1,
-            launchTime: Date.now(),
-            serverTime: Date.now(),
-            createArg: "0x" + "0".repeat(64), // Mock hex data
-            signature: "0x" + "0".repeat(130), // Mock signature
-            bamount: "24",
-            tamount: "1000000000"
-          }
-        };
-      }
-      throw corsError;
-    }
-  } catch (error) {
-    console.error('Create token error:', error);
-    throw new Error('Failed to create token on FourMeme: ' + (error as Error).message);
-  }
+  return invoke({
+    url: "/token/createFourMemeToken",
+    method: "POST",
+    data,
+    headers: {
+      "meme-web-access": accessToken,
+    },
+  }) as Promise<CreateTokenResponse>;
 };
 
-// Step 5: Save Token to Backend (mock for development)
-export const saveFourMemeToken = async (
+export interface SaveTokenRequest extends CreateTokenRequest {
+  txHash: string;
+  chainID: number;
+  apiKey?: string;
+  apiSecret?: string;
+  aiThesis?: AIThesisConfig;
+}
+
+export const saveFourMemeToken = (
   data: SaveTokenRequest
-): Promise<SaveTokenResponse> => {
-  try {
-    // Mock successful response for development
-    // In production, this would save to your backend database
-    console.warn('Save token skipped - using mock response for development');
-
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    return {
-      success: true,
-      data: {
-        tokenAddress: "0x" + Math.random().toString(16).substring(2, 42).padStart(40, '0'),
-      }
-    };
-  } catch (error) {
-    console.error('Save token error:', error);
-    throw new Error('Failed to save token data');
-  }
+): Promise<createTokenApiType> => {
+  return invoke({
+    url: "/token/saveFourMemeToken",
+    method: "POST",
+    data,
+  });
 };
+
 
 // Helper function to handle API errors
 export const handleApiError = (error: unknown): string => {
