@@ -8,6 +8,17 @@ import { ICreateToken, SuccessData, FourMemeLabel } from '../types/fourMeme';
 import { config as wagmiConfig } from '../wagmi';
 import appConfig from '../config';
 
+export type createTokenApiType = {
+  success: boolean;
+  error?: string;
+  data: {
+    tokenAddress: string;
+    imgUrl: string;
+    chainId: number;
+    message: string;
+  };
+};
+
 export const useCreateFourMeme = (
   formData: ICreateToken,
   imageFile: File | undefined,

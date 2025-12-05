@@ -75,41 +75,22 @@ export const loginFourMeme = (data: LoginRequest): Promise<LoginResponse> => {
   }) as Promise<LoginResponse>;
 };
 
-// Step 3: Upload Token Image
-export const uploadTokenImageFourMeme = async (
+export const uploadTokenImageFourMeme = (
   file: File,
   accessToken: string
 ): Promise<UploadImageResponse> => {
-  try {
-    // Try using invokeFourMeme first, fallback to mock if CORS fails
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
+  const data = new FormData();
+  data.append("images", file);
 
-      return invokeFourMeme({
-        url: "/v1/private/token/upload",
-        method: "POST",
-        data: formData,
-        headers: {
-          'meme-web-access': accessToken,
-        },
-        isFormData: true,
-      }) as Promise<UploadImageResponse>;
-    } catch (corsError) {
-      // If CORS error, return mock response for development
-      if (corsError instanceof TypeError || corsError.toString().includes('CORS')) {
-        console.warn('CORS error detected for image upload, using default image');
-        return {
-          code: "0",
-          data: 'https://public.bnbstatic.com/image/cms/blog/20190313/977e803b-c37e-4eb2-91fb-1a744a9bc7b6.png'
-        };
-      }
-      throw corsError;
-    }
-  } catch (error) {
-    console.error('Upload image error:', error);
-    throw new Error('Failed to upload token image');
-  }
+  return invoke({
+    url: "/token/uploadTokenImageFourMeme",
+    method: "POST",
+    data,
+    headers: {
+      "Content-Type": "multipart/form-data",
+      "meme-web-access": accessToken,
+    },
+  }) as Promise<UploadImageResponse>;
 };
 
 export async function invoke({

@@ -1,4 +1,4 @@
-// FourMeme Token Creation Types
+// FourMeme Token Creation Typee
 
 export interface ICreateToken {
   selectedDexId: "fourmeme";
