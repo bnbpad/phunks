@@ -127,8 +127,10 @@ export const createFourMemeToken = async (
         },
       }
     );
+    console.log("create four meme token response", response.data);
     return response.data;
   } catch (error) {
+    console.log((error as any).response.data);
     console.error("Error creating Four Meme token:", error);
     throw new BadRequestError("Failed to create Four Meme token", error);
   }
@@ -138,12 +140,14 @@ export const saveFourMemeToken = async (
   body: ICreateFourMemeToken & {
     txHash: string;
     chainId?: number;
-    apiKey?: string;
-    apiSecret?: string;
     aiThesis?: IAIThesis;
   }
 ) => {
   try {
+    console.log("save four meme token body", body);
+    console.log("save four meme token chainId", body.chainId);
+    console.log("save four meme token txHash", body.txHash);
+    console.log("save four meme token aiThesis", body.aiThesis);
     const chainId = (body.chainId || 56) as ChainID;
 
     if (!CHAIN_CONFIG[chainId]) {
