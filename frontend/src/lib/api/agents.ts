@@ -1,4 +1,5 @@
 // Agents API Integration
+// Endpoints: GET /agents and GET /agents/:id
 import { config } from '../config';
 
 // TypeScript interfaces based on API documentation
@@ -93,7 +94,7 @@ export interface ErrorResponse {
 // API Functions
 export const fetchAgentDetails = async (agentId: string): Promise<AgentDetailResponse> => {
   try {
-    const response = await fetch(`${config.api.baseURL}/api/agents/${agentId}`, {
+    const response = await fetch(`${config.api.baseURL}/agents/${agentId}`, {
       headers: {
         'Content-Type': 'application/json',
       },
@@ -121,7 +122,7 @@ export const fetchAgentsList = async (params: AgentsListParams = {}): Promise<Ag
       ...(params.search && { search: params.search })
     });
 
-    const response = await fetch(`${config.api.baseURL}/api/agents?${queryString}`, {
+    const response = await fetch(`${config.api.baseURL}/agents?${queryString}`, {
       headers: {
         'Content-Type': 'application/json',
       },
