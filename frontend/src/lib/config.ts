@@ -33,7 +33,7 @@ export const config = {
       abi: TokenManagerABI
     },
     agentLaunchpad: {
-      address: '0x209f28b4E3bca2528839f3D9C349262828738454',
+      address: '0x10c0043Dcd70054E8f040fa199FD5B3Ed2Dbb7A3',
       abi: AgentLaunchpadABI
     },
     agentNFT: '0x742d35Cc6634C0532925a3b8D91d99e2c4b851E8',

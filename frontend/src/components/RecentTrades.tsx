@@ -1,23 +1,16 @@
 import React from 'react'
-
-interface Trade {
-  id: number
-  description: string
-}
+import { Trade } from '../lib/api/agents'
 
 interface RecentTradesProps {
+  trades?: Trade[]
   className?: string
 }
 
-const SimplifiedRecentTrades: React.FC<RecentTradesProps> = ({ className = "" }) => {
-  // Sample trades data
-  const trades: Trade[] = [
-    { id: 1, description: "Swapped BNB for PCS" },
-    { id: 2, description: "Swapped USDT for BNB" },
-    { id: 3, description: "Swapped CAKE for USDT" },
-    { id: 4, description: "Swapped ETH for BNB" },
-    { id: 5, description: "Swapped BNB for USDT" }
-  ]
+const SimplifiedRecentTrades: React.FC<RecentTradesProps> = ({ trades = [], className = "" }) => {
+  // Don't render if there are no trades
+  if (trades.length === 0) {
+    return null
+  }
 
   return (
     <div className={`bg-white card-shadow rounded-xl p-6 h-fit ${className}`}>

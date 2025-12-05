@@ -17,7 +17,7 @@ export interface AIActivity {
   impact: 'High' | 'Medium' | 'Low';
   metrics: Record<string, string>;
   status: 'active' | 'completed' | 'monitoring' | 'executed' | 'processed';
-  evolutionChanges?: EvolutionChange[];
+  evolutionChanges: EvolutionChange[];
 }
 
 export interface EvolutionChange {
@@ -200,6 +200,7 @@ export const fetchAgentsList = async (params: AgentsListParams = {}): Promise<Ag
     throw error;
   }
 };
+
 
 // Helper function to handle API errors
 export const handleApiError = (error: unknown): string => {

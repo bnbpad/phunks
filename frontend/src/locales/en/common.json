@@ -105,7 +105,7 @@
   },
   "agentsPage": {
     "title": "All AI Agents",
-    "subtitle": "Comprehensive list of all AI agents on BSC",
+    "subtitle": "",
     "stats": {
       "totalStrategies": "Total Agents",
       "profitable": "Profitable",
@@ -176,7 +176,7 @@
   },
   "leaderboard": {
     "title": "Leaderboard",
-    "subtitle": "Top performing AI agents on BSC",
+    "subtitle": "",
     "stats": {
       "totalAgents": "Total Agents",
       "activeTrades": "Active Trades",

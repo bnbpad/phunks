@@ -1,11 +1,12 @@
 import React, { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Zap, TrendingUp } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import ActivityEvolutionChanges from '../components/ActivityEvolutionChanges'
 import EvolutionChangesModal from '../components/EvolutionChangesModal'
 import SimplifiedRecentTrades from '../components/RecentTrades'
 import { useAgent } from '../lib/hooks/useAgent'
+import { useAgentActions } from '../lib/hooks/useAgentActions'
 
 const AgentDashboard = () => {
   const { id } = useParams()
@@ -20,6 +21,9 @@ const AgentDashboard = () => {
   // Fetch agent data from API
   const { agent, isLoading, error } = useAgent(id)
 
+  // Agent actions hook
+  const { evolve, perform, isPerformLoading, isEvolveLoading, error: actionError, setError: setActionError } = useAgentActions()
+
   const handleShowEvolutionChanges = (activity: any) => {
     setSelectedEvolutionData({
       changes: activity.evolutionChanges,
@@ -27,6 +31,28 @@ const AgentDashboard = () => {
       time: activity.time
     })
     setModalOpen(true)
+  }
+
+  const handleEvolve = async () => {
+    if (!id) return;
+    setActionError(null);
+    try {
+      await evolve(id);
+      // Success feedback could be added here
+    } catch (err) {
+      console.error('Evolve failed:', err);
+    }
+  }
+
+  const handlePerform = async () => {
+    if (!id) return;
+    setActionError(null);
+    try {
+      await perform(id);
+      // Success feedback could be added here
+    } catch (err) {
+      console.error('Perform failed:', err);
+    }
   }
 
   // Loading state
@@ -93,21 +119,43 @@ const AgentDashboard = () => {
   const recentTrades = agent.recentTrades
 
   // Use real evolution changes data from API
-  const evolutionChangesData = agent.evolutionChanges
+  // const evolutionChangesData = agent.evolutionChanges
 
   // Use real AI activities data from API
   const aiActivities = agent.aiActivities
 
   return (
     <div className="space-y-8">
-      {/* Back Button */}
-      <Link
-        to="/traders"
-        className="inline-flex items-center gap-2 text-bsc-600 hover:text-bsc-700 transition-colors font-exo font-medium"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        {t('navigation.backToTraders')}
-      </Link>
+      {/* Back Button and Action Buttons */}
+      <div className="flex items-center justify-between">
+        <Link
+          to="/traders"
+          className="inline-flex items-center gap-2 text-bsc-600 hover:text-bsc-700 transition-colors font-exo font-medium"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          {t('navigation.backToTraders')}
+        </Link>
+
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handlePerform}
+            disabled={isPerformLoading}
+            className="flex items-center gap-2 px-4 py-2 bg-bsc-500 hover:bg-bsc-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg font-exo font-medium transition-colors text-sm"
+          >
+            <Zap className="w-4 h-4" />
+            {isPerformLoading ? 'Processing...' : 'Perform'}
+          </button>
+
+          <button
+            onClick={handleEvolve}
+            disabled={isEvolveLoading}
+            className="flex items-center gap-2 px-4 py-2 bg-purple-500 hover:bg-purple-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg font-exo font-medium transition-colors text-sm"
+          >
+            <TrendingUp className="w-4 h-4" />
+            {isEvolveLoading ? 'Processing...' : 'Evolve'}
+          </button>
+        </div>
+      </div>
 
       {/* Header */}
       <div className="bg-white card-shadow rounded-xl p-8">
@@ -130,6 +178,13 @@ const AgentDashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* Action Error Display */}
+      {actionError && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
+          <p className="text-red-600 font-exo">{actionError}</p>
+        </div>
+      )}
 
       {/* Two Column Layout - AI Activity & Trades */}
       <div className="grid lg:grid-cols-[70%,30%] gap-8 lg:items-start">
@@ -289,7 +344,8 @@ const AgentDashboard = () => {
             </div>
           </div>
 
-          {/* AI Status Header */}
+          {/* TODO: AI Status Header - Replace hardcoded metrics with real API data */}
+          {/*
           <div className="bg-gray-900 rounded-xl p-4 mb-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -312,6 +368,7 @@ const AgentDashboard = () => {
               </div>
             </div>
           </div>
+          */}
 
           {/* Activity Feed */}
           <div className="space-y-3 max-h-[700px] overflow-y-auto">
@@ -406,7 +463,7 @@ const AgentDashboard = () => {
         </div>
 
         {/* Recent Trades */}
-        <SimplifiedRecentTrades />
+        <SimplifiedRecentTrades trades={recentTrades} />
 
       </div>
 
