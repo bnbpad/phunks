@@ -20,20 +20,23 @@ async function invokeFourMeme({
   method = "GET",
   data,
   headers = {},
+  isFormData = false,
 }: {
   url: string;
   method?: string;
   data?: any;
   headers?: Record<string, string>;
+  isFormData?: boolean;
 }): Promise<unknown> {
   try {
+    const requestHeaders = isFormData
+      ? { ...headers } // Don't set Content-Type for FormData, let browser handle it
+      : { 'Content-Type': 'application/json', ...headers };
+
     const response = await fetch(`${FOUR_MEME_BASE_URL}${url}`, {
       method,
-      headers: {
-        'Content-Type': 'application/json',
-        ...headers,
-      },
-      body: data ? JSON.stringify(data) : undefined,
+      headers: requestHeaders,
+      body: isFormData ? data : (data ? JSON.stringify(data) : undefined),
     });
 
     if (!response.ok) {
@@ -78,24 +81,20 @@ export const uploadTokenImageFourMeme = async (
   accessToken: string
 ): Promise<UploadImageResponse> => {
   try {
-    // Try direct API call first, fallback to mock if CORS fails
+    // Try using invokeFourMeme first, fallback to mock if CORS fails
     try {
       const formData = new FormData();
       formData.append('file', file);
 
-      const response = await fetch(`${FOUR_MEME_BASE_URL}/v1/private/token/upload`, {
-        method: 'POST',
+      return invokeFourMeme({
+        url: "/v1/private/token/upload",
+        method: "POST",
+        data: formData,
         headers: {
           'meme-web-access': accessToken,
         },
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      return await response.json();
+        isFormData: true,
+      }) as Promise<UploadImageResponse>;
     } catch (corsError) {
       // If CORS error, return mock response for development
       if (corsError instanceof TypeError || corsError.toString().includes('CORS')) {
@@ -113,28 +112,22 @@ export const uploadTokenImageFourMeme = async (
   }
 };
 
-// Step 4: Create Token on FourMeme (using proxy approach for CORS)
+// Step 4: Create Token on FourMeme
 export const createTokenFourMeme = async (
   data: CreateTokenRequest,
   accessToken: string
 ): Promise<CreateTokenResponse> => {
   try {
-    // Try direct API call first, fallback to mock if CORS fails
+    // Try using invokeFourMeme first, fallback to mock if CORS fails
     try {
-      const response = await fetch(`${FOUR_MEME_BASE_URL}/v1/private/token/create`, {
-        method: 'POST',
+      return invokeFourMeme({
+        url: "/v1/private/token/create",
+        method: "POST",
+        data,
         headers: {
-          'Content-Type': 'application/json',
           'meme-web-access': accessToken,
         },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      return await response.json();
+      }) as Promise<CreateTokenResponse>;
     } catch (corsError) {
       // If CORS error, return mock response for development
       if (corsError instanceof TypeError || corsError.toString().includes('CORS')) {
