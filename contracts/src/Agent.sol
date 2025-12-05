@@ -13,4 +13,6 @@ contract Agent {
         (bool success,) = to.call{value: value}(data);
         require(success, "Action failed");
     }
+
+    receive() external payable {}
 }
