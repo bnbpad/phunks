@@ -547,7 +547,9 @@ const AgentDashboard = () => {
         </div>
       </div>
 
-      {/* BSC Network Info */}
+      {/* TODO: Add back BSC Network Benefits section later */}
+      {/*
+      BSC Network Info
       <div className="bg-bsc-50 rounded-xl p-8">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-8 h-8 bg-bsc-500 diamond-shape"></div>
@@ -572,6 +574,7 @@ const AgentDashboard = () => {
           </div>
         </div>
       </div>
+      */}
 
       {/* Evolution Changes Modal */}
       {selectedEvolutionData && (

@@ -83,10 +83,16 @@ const AgentCard = ({ id, name, symbol, pnl, health, evolution, trades, image }: 
           </div>
           */}
 
-          {/* BSC Badge */}
-          <div className="flex items-center gap-2 text-xs text-bsc-600">
-            <div className="w-3 h-3 bg-bsc-500 diamond-shape"></div>
-            <span className="font-exo">{t('common.bscNetwork')}</span>
+          {/* Network Badges */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-xs text-bsc-600">
+              <img src="/bsc.svg" alt="BSC" className="w-8 h-8" />
+              <span className="font-exo">{t('common.bscNetwork')}</span>
+            </div>
+            <div className="flex items-center gap-2 text-xs text-purple-600">
+              <img src="/fourmeme.svg" alt="Four.meme" className="w-6 h-6" />
+              <span className="font-exo">four.meme</span>
+            </div>
           </div>
         </div>
       </div>
