@@ -106,7 +106,6 @@ export const useCreateFourMeme = (
         );
 
         if (!fourMemeApi.isApiSuccess(uploadResponse)) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           throw new Error((uploadResponse as any)?.msg || 'Failed to upload image');
         }
 

@@ -9,19 +9,22 @@ import {
   CreateTokenRequest,
   CreateTokenResponse, AIThesisConfig
 } from '../types/fourMeme';
-import axios, { AxiosHeaders, AxiosRequestConfig, AxiosResponse } from "axios";
+
+// Re-export types that are used by other modules
+export type { CreateTokenRequest } from '../types/fourMeme';
+import axios, {AxiosHeaders, AxiosRequestConfig, AxiosResponse} from "axios";
 import {createTokenApiType} from "../hooks/useCreateFourMeme.ts";
 
 const FOUR_MEME_BASE_URL = "https://four.meme/meme-api";
 
 // Helper function to call FourMeme API directly
 async function invokeFourMeme({
-  url,
-  method = "GET",
-  data,
-  headers = {},
-  isFormData = false,
-}: {
+                                url,
+                                method = "GET",
+                                data,
+                                headers = {},
+                                isFormData = false,
+                              }: {
   url: string;
   method?: string;
   data?: any;
@@ -30,8 +33,8 @@ async function invokeFourMeme({
 }): Promise<unknown> {
   try {
     const requestHeaders = isFormData
-      ? { ...headers } // Don't set Content-Type for FormData, let browser handle it
-      : { 'Content-Type': 'application/json', ...headers };
+      ? {...headers} // Don't set Content-Type for FormData, let browser handle it
+      : {'Content-Type': 'application/json', ...headers};
 
     const response = await fetch(`${FOUR_MEME_BASE_URL}${url}`, {
       method,
@@ -75,32 +78,14 @@ export const loginFourMeme = (data: LoginRequest): Promise<LoginResponse> => {
   }) as Promise<LoginResponse>;
 };
 
-export const uploadTokenImageFourMeme = (
-  file: File,
-  accessToken: string
-): Promise<UploadImageResponse> => {
-  const data = new FormData();
-  data.append("images", file);
-
-  return invoke({
-    url: "/token/uploadTokenImageFourMeme",
-    method: "POST",
-    data,
-    headers: {
-      "Content-Type": "multipart/form-data",
-      "meme-web-access": accessToken,
-    },
-  }) as Promise<UploadImageResponse>;
-};
-
 export async function invoke({
                                baseURL = "https://fd32c497428a.ngrok-free.app/",
                                url,
                                method = "GET",
                                data,
                                headers = {},
-                             }: // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                             AxiosRequestConfig): Promise<any> { // eslint-disable-line @typescript-eslint/no-explicit-any
+                             }:
+                             AxiosRequestConfig): Promise<any> {
   try {
     // todo get auth code from redux store and not local storage
     const authCode =
@@ -132,7 +117,24 @@ export async function invoke({
   }
 }
 
-// Step 4: Create Token on FourMeme (using proxy approach for CORS)
+export const uploadTokenImageFourMeme = (
+  file: File,
+  accessToken: string
+): Promise<UploadImageResponse> => {
+  const data = new FormData();
+  data.append("images", file);
+
+  return invoke({
+    url: "/token/uploadTokenImageFourMeme",
+    method: "POST",
+    data,
+    headers: {
+      "Content-Type": "multipart/form-data",
+      "meme-web-access": accessToken,
+    },
+  }) as Promise<UploadImageResponse>;
+};
+
 export const createTokenFourMeme = (
   data: CreateTokenRequest,
   accessToken: string
