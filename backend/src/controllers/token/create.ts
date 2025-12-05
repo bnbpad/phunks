@@ -232,6 +232,7 @@ export const saveFourMemeToken = async (
         chainId: chainId,
       });
     }
+
     return {
       tokenId: newToken.id,
       tokenAddress: tokenAddress.toLowerCase(),

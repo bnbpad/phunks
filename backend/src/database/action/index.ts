@@ -1,15 +1,15 @@
-import mongoose, { Document, Model, Schema } from 'mongoose';
+import mongoose, { Document, Model, Schema } from "mongoose";
 
-export type TradeAction = 'BUY' | 'SELL' | 'HOLD';
-export type RiskLevel = 'HIGH' | 'MEDIUM' | 'LOW';
-export type TradeStatus = 'pending' | 'completed' | 'failed' | 'cancelled';
+export type TradeAction = "BUY" | "SELL" | "HOLD";
+export type RiskLevel = "HIGH" | "MEDIUM" | "LOW";
+export type TradeStatus = "pending" | "completed" | "failed" | "cancelled";
 export type MarketCondition =
-  | 'LOW_LIQUIDITY'
-  | 'HIGH_MOMENTUM'
-  | 'BULLISH_SENTIMENT'
-  | 'BEARISH_SENTIMENT'
-  | 'HIGH_VOLATILITY'
-  | 'STABLE';
+  | "LOW_LIQUIDITY"
+  | "HIGH_MOMENTUM"
+  | "BULLISH_SENTIMENT"
+  | "BEARISH_SENTIMENT"
+  | "HIGH_VOLATILITY"
+  | "STABLE";
 
 export interface ITechnicalIndicators {
   rsi: number;
@@ -26,56 +26,56 @@ export interface IMarketData {
   priceChange24h: number;
   volatility: number;
   liquidity: number;
-  sentiment: 'bullish' | 'bearish' | 'neutral';
+  sentiment: "bullish" | "bearish" | "neutral";
   technicalIndicators: ITechnicalIndicators;
 }
 
 export interface ITransactionData {
-  orderId: number;
-  symbol: string;
-  status: string;
-  clientOrderId: string;
-  price: string;
   avgPrice: string;
-  origQty: string;
-  executedQty: string;
+  clientOrderId: string;
+  closePosition: boolean;
   cumQty: string;
   cumQuote: string;
+  executedQty: string;
+  orderId: number;
+  origQty: string;
+  origType: string;
+  positionSide: string;
+  price: string;
+  priceProtect: boolean;
+  reduceOnly: boolean;
+  side: string;
+  status: string;
+  stopPrice: string;
+  symbol: string;
   timeInForce: string;
   type: string;
-  reduceOnly: boolean;
-  closePosition: boolean;
-  side: string;
-  positionSide: string;
-  stopPrice: string;
-  workingType: string;
-  priceProtect: boolean;
-  origType: string;
   updateTime: number;
+  workingType: string;
 }
 
 export interface ITrade {
-  dex: 'aster' | 'fourmeme';
-  tokenAddress: string;
   action: TradeAction;
-  symbol: string;
   amount: number;
+  confidence: number;
+  createdAt?: Date;
+  dex: "aster" | "fourmeme";
+  gasUsed?: string;
+  marketConditions: MarketCondition[];
+  marketData: IMarketData;
+  positionSize: number;
   price: number;
   prompt: string;
   reasoning: string;
-  confidence: number;
   riskLevel: RiskLevel;
-  positionSize: number;
-  stopLoss?: number;
-  takeProfit?: number;
-  marketConditions: MarketCondition[];
-  marketData: IMarketData;
-  transactionFrom: string;
   status: TradeStatus;
-  gasUsed?: string;
-  transactionHash?: string;
+  stopLoss?: number;
+  symbol: string;
+  takeProfit?: number;
+  tokenAddress: string;
   transactionData?: ITransactionData;
-  createdAt?: Date;
+  transactionFrom: string;
+  transactionHash?: string;
   updatedAt?: Date;
 }
 
@@ -92,12 +92,12 @@ const TradeSchema: Schema = new Schema(
     dex: {
       type: String,
       required: true,
-      enum: ['aster', 'fourmeme'],
+      enum: ["aster", "fourmeme"],
     },
     action: {
       type: String,
       required: true,
-      enum: ['BUY', 'SELL', 'HOLD'],
+      enum: ["BUY", "SELL", "HOLD"],
     },
     symbol: {
       type: String,
@@ -128,7 +128,7 @@ const TradeSchema: Schema = new Schema(
     riskLevel: {
       type: String,
       required: true,
-      enum: ['HIGH', 'MEDIUM', 'LOW'],
+      enum: ["HIGH", "MEDIUM", "LOW"],
     },
     positionSize: {
       type: Number,
@@ -143,13 +143,13 @@ const TradeSchema: Schema = new Schema(
     marketConditions: {
       type: [String],
       enum: [
-        'LOW_LIQUIDITY',
-        'HIGH_MOMENTUM',
-        'BULLISH_SENTIMENT',
-        'BEARISH_SENTIMENT',
-        'HIGH_VOLATILITY',
-        'STABLE',
-        'DOWNTREND',
+        "LOW_LIQUIDITY",
+        "HIGH_MOMENTUM",
+        "BULLISH_SENTIMENT",
+        "BEARISH_SENTIMENT",
+        "HIGH_VOLATILITY",
+        "STABLE",
+        "DOWNTREND",
       ],
       default: [],
     },
@@ -185,7 +185,7 @@ const TradeSchema: Schema = new Schema(
       sentiment: {
         type: String,
         required: true,
-        enum: ['bullish', 'bearish', 'neutral'],
+        enum: ["bullish", "bearish", "neutral"],
       },
       technicalIndicators: {
         rsi: {
@@ -214,8 +214,8 @@ const TradeSchema: Schema = new Schema(
     status: {
       type: String,
       required: true,
-      enum: ['pending', 'completed', 'failed', 'cancelled'],
-      default: 'pending',
+      enum: ["pending", "completed", "failed", "cancelled"],
+      default: "pending",
     },
     gasUsed: {
       type: String,
@@ -232,4 +232,7 @@ const TradeSchema: Schema = new Schema(
   { timestamps: true }
 );
 
-export const Trades: Model<ITradeDocument> = mongoose.model<ITradeDocument>('Trade', TradeSchema);
+export const Trades: Model<ITradeDocument> = mongoose.model<ITradeDocument>(
+  "Trade",
+  TradeSchema
+);

@@ -1,7 +1,7 @@
 import { AIDecisions } from "../../database/AIDecison";
 import { AIThesisModel } from "../../database/aiThesis";
 import { Tokens } from "../../database/token";
-import { Trades } from "../../database/trade";
+import { Trades } from "../../database/action";
 import { EvolutionChange } from "./decision";
 import { NotFoundError, BadRequestError } from "../../errors";
 
