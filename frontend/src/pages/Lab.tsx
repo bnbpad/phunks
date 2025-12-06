@@ -126,79 +126,31 @@ const Lab = () => {
             </div>
           </div>
 
-          <div className="space-y-6">
-            <h3 className="text-xl font-orbitron font-bold text-gray-900 text-center">
-              Featured Phunks
-            </h3>
-
-            {/* Random Phunk Cards */}
-            <div className="space-y-4">
-              {/* Phunk Card 1 */}
-              <div className="bg-white card-shadow rounded-lg p-4 hover:shadow-lg transition-all group cursor-pointer">
-                <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-lg overflow-hidden bg-gradient-to-br from-purple-400 to-pink-400 flex-shrink-0">
-                    <img src="/avatars/avatar1.png" alt="Crypto Punk #1337" className="w-full h-full object-cover" />
+          <div className="relative flex justify-center">
+            <div className="w-80 h-80 relative">
+              {/* Random Phunk Images Display */}
+              <div className="grid grid-cols-2 gap-4 h-full">
+                <div className="space-y-4">
+                  <div className="w-full h-32 rounded-lg overflow-hidden bg-gray-100">
+                    <img src="/avatars/avatar1.png" alt="Phunk" className="w-full h-full object-cover" />
                   </div>
-                  <div className="flex-1">
-                    <h4 className="font-exo font-semibold text-gray-900 group-hover:text-bsc-600 transition-colors">
-                      Crypto Punk #1337
-                    </h4>
-                    <p className="text-sm text-gray-600 font-exo">AI Trading Master</p>
-                    <div className="flex items-center gap-2 mt-2">
-                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <span className="text-xs text-green-600 font-exo">+247% P&L</span>
-                    </div>
+                  <div className="w-full h-32 rounded-lg overflow-hidden bg-gray-100">
+                    <img src="/avatars/avatar3.png" alt="Phunk" className="w-full h-full object-cover" />
+                  </div>
+                </div>
+                <div className="space-y-4 pt-8">
+                  <div className="w-full h-32 rounded-lg overflow-hidden bg-gray-100">
+                    <img src="/avatars/avatar5.png" alt="Phunk" className="w-full h-full object-cover" />
+                  </div>
+                  <div className="w-full h-32 rounded-lg overflow-hidden bg-gray-100">
+                    <img src="/avatars/avatar7.png" alt="Phunk" className="w-full h-full object-cover" />
                   </div>
                 </div>
               </div>
 
-              {/* Phunk Card 2 */}
-              <div className="bg-white card-shadow rounded-lg p-4 hover:shadow-lg transition-all group cursor-pointer">
-                <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-lg overflow-hidden bg-gradient-to-br from-blue-400 to-cyan-400 flex-shrink-0">
-                    <img src="/avatars/avatar3.png" alt="Cyber Phunk #2048" className="w-full h-full object-cover" />
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-exo font-semibold text-gray-900 group-hover:text-bsc-600 transition-colors">
-                      Cyber Phunk #2048
-                    </h4>
-                    <p className="text-sm text-gray-600 font-exo">DeFi Specialist</p>
-                    <div className="flex items-center gap-2 mt-2">
-                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <span className="text-xs text-green-600 font-exo">+189% P&L</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Phunk Card 3 */}
-              <div className="bg-white card-shadow rounded-lg p-4 hover:shadow-lg transition-all group cursor-pointer">
-                <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-lg overflow-hidden bg-gradient-to-br from-green-400 to-emerald-400 flex-shrink-0">
-                    <img src="/avatars/avatar5.png" alt="Meta Phunk #4096" className="w-full h-full object-cover" />
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-exo font-semibold text-gray-900 group-hover:text-bsc-600 transition-colors">
-                      Meta Phunk #4096
-                    </h4>
-                    <p className="text-sm text-gray-600 font-exo">Yield Farmer</p>
-                    <div className="flex items-center gap-2 mt-2">
-                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <span className="text-xs text-green-600 font-exo">+156% P&L</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="text-center pt-4">
-              <Link
-                to="/traders"
-                className="inline-flex items-center gap-2 text-bsc-600 hover:text-bsc-700 transition-colors font-exo font-medium text-sm"
-              >
-                View All Phunks
-                <ArrowRight className="w-4 h-4" />
-              </Link>
+              {/* Floating elements for visual interest */}
+              <div className="absolute -top-4 -right-4 w-6 h-6 bg-bsc-500 diamond-shape opacity-60"></div>
+              <div className="absolute -bottom-4 -left-4 w-8 h-8 bg-bsc-400 diamond-shape opacity-40"></div>
             </div>
           </div>
         </div>
