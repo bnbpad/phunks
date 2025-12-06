@@ -4,8 +4,13 @@ import { config } from '../config';
 
 // TypeScript interfaces based on API documentation
 export interface Trade {
-  id: number;
+  _id: string;
+  tokenAddress: string;
+  amount: string; // Amount in wei as string
   description: string;
+  createdAt: string; // ISO timestamp
+  updatedAt: string; // ISO timestamp
+  __v: number;
 }
 
 export interface AIActivity {
