@@ -120,6 +120,7 @@ const Step3AIThesis: React.FC<Step3AIThesisProps> = ({
       </div>
 
       {/* Agent Creation Info */}
+      {/*
       <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg p-6 border border-purple-200">
         <h4 className="font-orbitron font-bold text-gray-900 mb-3">
           🤖 AI Agent Creation
@@ -146,6 +147,7 @@ const Step3AIThesis: React.FC<Step3AIThesisProps> = ({
           </p>
         </div>
       </div>
+      */}
     </div>
   )
 }

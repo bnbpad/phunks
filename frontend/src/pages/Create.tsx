@@ -138,19 +138,20 @@ const Create = () => {
           Create your AI agent on BSC with self-learning capabilities
         </p>
 
-        {/* Four.Meme Launch Banner */}
-        {/*
-        <div className="flex items-center justify-center gap-3">
-          <img src="/fourmeme.svg" alt="Four.Meme" className="w-6 h-6" />
-          <h2 className="text-lg font-orbitron font-bold text-gray-900">
-            Launching on Four.Meme
-          </h2>
-        </div>
-        */}
-
-        <div className="flex items-center justify-center gap-2 text-sm text-gray-500 font-exo">
-          <img src="/bsc.svg" alt="BNB Smart Chain" className="w-6 h-6" />
-          <span>Powered by BNB Smart Chain</span>
+        {/* Four.Meme and BNB Branding */}
+        <div className="flex items-center justify-center gap-6">
+          <div className="flex items-center gap-2">
+            <img src="/fourmeme.svg" alt="Four.Meme" className="w-6 h-6" />
+            <span className="text-lg font-orbitron font-bold text-gray-900">
+              Launching on Four.Meme
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <img src="/bsc.svg" alt="BNB Smart Chain" className="w-6 h-6" />
+            <span className="text-lg font-orbitron font-bold text-gray-900">
+              Powered by BNB Smart Chain
+            </span>
+          </div>
         </div>
       </div>
 

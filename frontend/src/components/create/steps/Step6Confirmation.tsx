@@ -271,44 +271,6 @@ const Step6Confirmation: React.FC<Step6ConfirmationProps> = ({
         </div>
       </div>
 
-      {/* Wallet Connection Section */}
-      <div className="grid lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2">
-          <div className="bg-white border border-gray-200 rounded-xl p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-orbitron font-bold text-gray-900">Wallet Connection</h3>
-              <ConnectWallet />
-            </div>
-
-            {!walletState.isConnected ? (
-              <div className="text-center py-8">
-                <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Wallet className="w-6 h-6 text-gray-400" />
-                </div>
-                <p className="text-gray-600 font-exo">Connect your wallet to create tokens on FourMeme</p>
-                <p className="text-sm text-gray-500 font-exo mt-2">BSC network required</p>
-              </div>
-            ) : !walletState.isCorrectNetwork ? (
-              <div className="text-center py-8">
-                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Wallet className="w-6 h-6 text-red-500" />
-                </div>
-                <p className="text-red-600 font-exo mb-2">Wrong network detected</p>
-                <p className="text-gray-600 font-exo">Please switch to BNB Smart Chain (BSC)</p>
-              </div>
-            ) : (
-              <div className="flex items-center gap-3 p-4 bg-green-50 rounded-lg">
-                <CheckCircle className="w-5 h-5 text-green-600" />
-                <span className="text-green-700 font-exo">Wallet connected to BSC</span>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="lg:col-span-1">
-          {walletState.isConnected && walletState.isCorrectNetwork && <BalanceDisplay />}
-        </div>
-      </div>
 
 
       {/* What Happens Next */}
@@ -318,12 +280,15 @@ const Step6Confirmation: React.FC<Step6ConfirmationProps> = ({
         </h4>
         <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-700 font-exo">
           <div className="space-y-2">
-            <p>• <strong>Wallet Signature:</strong> Confirm transaction in your wallet</p>
-            <p>• <strong>Token Deployment:</strong> Smart contract deployed on BSC</p>
+            <p><span className="inline-flex items-center justify-center w-5 h-5 bg-blue-500 text-white text-xs font-bold rounded-full mr-2">1</span><strong>Authentication:</strong> Sign message to login to Four.Meme</p>
+            <p><span className="inline-flex items-center justify-center w-5 h-5 bg-blue-500 text-white text-xs font-bold rounded-full mr-2">2</span><strong>Image Upload:</strong> Upload token image to Four.Meme servers</p>
+            <p><span className="inline-flex items-center justify-center w-5 h-5 bg-blue-500 text-white text-xs font-bold rounded-full mr-2">3</span><strong>Token Creation:</strong> Register token details on Four.Meme platform</p>
+            <p><span className="inline-flex items-center justify-center w-5 h-5 bg-blue-500 text-white text-xs font-bold rounded-full mr-2">4</span><strong>Blockchain Deployment:</strong> Deploy smart contract on BSC network</p>
           </div>
           <div className="space-y-2">
-            <p>• <strong>Liquidity Addition:</strong> Trading pool created on Four.Meme</p>
-            <p>• <strong>Live Trading:</strong> Token immediately available for trading</p>
+            <p><span className="inline-flex items-center justify-center w-5 h-5 bg-blue-500 text-white text-xs font-bold rounded-full mr-2">5</span><strong>Backend Registration:</strong> Save token data to our backend</p>
+            <p><span className="inline-flex items-center justify-center w-5 h-5 bg-blue-500 text-white text-xs font-bold rounded-full mr-2">6</span><strong>AI Agent Deploy:</strong> Create AI agent if configured</p>
+            <p><span className="inline-flex items-center justify-center w-5 h-5 bg-green-500 text-white text-xs font-bold rounded-full mr-2">7</span><strong>Launch Complete:</strong> Token live and tradeable on Four.Meme</p>
           </div>
         </div>
       </div>
