@@ -43,7 +43,7 @@ const run = async () => {
 
         console.log("newdecision", newdecision);
 
-        await thesis.set("tasks", newdecision);
+        await thesis.set("memory", newdecision.join("\n"));
         await thesis.save();
 
         await AIDecisions.insertOne({
@@ -53,12 +53,11 @@ const run = async () => {
           prompt: "",
         });
 
-        // const tx = await responder.respondWithUpgrade({
-        //   hash: event.hash,
-        //   memory:
-        //     "Agent has learned to trade more effectively based on market conditions.",
-        // });
-        // console.log("Upgrade transaction:", tx.hash);
+        const tx = await responder.respondWithUpgrade({
+          hash: event.hash,
+          memory: newdecision.join(", "),
+        });
+        console.log("Upgrade transaction:", tx.hash);
       } else if (event.actionId.toString() == "0") {
         // perform action
         // const tx = await responder.respondWithAction({

@@ -360,6 +360,7 @@ Provide your analysis and recommendation.`
       "  • Adjusted focus",
       "  • Lessons from prior actions",
       "- The tasks must remain high-level but actionable, suitable for a recurring portfolio-review loop",
+      "- If you dont want to change the task, just return the same value. Do NOT create tasks with different texts but mean the same thing.",
       "- Do NOT output decisions, JSON, actions, or portfolio commentary",
       "- Output ONLY the new task list (no explanations, no intro text)",
       "",
@@ -374,7 +375,7 @@ Provide your analysis and recommendation.`
       "Recommend new entries only if…",
       "Monitor market conditions for…",
       "",
-      "Only output the new task list (maximum 6 tasks, with ~50% kept from previous and ~50% new/changed).",
+      "Only output the new task list (maximum 4 tasks, with ~50% kept from previous and ~50% new/changed).",
     ].join("\n");
 
     const response = await this.callOpenAI(newTaskPrompt);
