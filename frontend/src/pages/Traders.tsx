@@ -269,7 +269,9 @@ const Traders = () => {
         </p>
       </div>
 
+      {/* TODO: Uncomment stats overview when real agent data is available */}
       {/* Stats Overview */}
+      {/*
       <div className="grid md:grid-cols-4 gap-6">
         <div className="bg-white card-shadow rounded-xl p-6 text-center">
           <Users className="w-8 h-8 text-bsc-600 mx-auto mb-4" />
@@ -295,6 +297,7 @@ const Traders = () => {
           <p className="text-sm text-gray-500 mt-1 font-exo">{t('agentsPage.stats.avgPerformance')}</p>
         </div>
       </div>
+      */}
 
       {/* Search and Filter Controls */}
       <div className="bg-white card-shadow rounded-xl p-6">
