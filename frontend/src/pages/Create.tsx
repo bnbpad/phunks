@@ -139,12 +139,14 @@ const Create = () => {
         </p>
 
         {/* Four.Meme Launch Banner */}
+        {/*
         <div className="flex items-center justify-center gap-3">
           <img src="/fourmeme.svg" alt="Four.Meme" className="w-6 h-6" />
           <h2 className="text-lg font-orbitron font-bold text-gray-900">
             Launching on Four.Meme
           </h2>
         </div>
+        */}
 
         <div className="flex items-center justify-center gap-2 text-sm text-gray-500 font-exo">
           <img src="/bsc.svg" alt="BNB Smart Chain" className="w-6 h-6" />

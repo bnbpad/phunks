@@ -287,6 +287,7 @@ const Step1BasicDetails: React.FC<Step1BasicDetailsProps> = ({
           />
 
           {/* Four.Meme Launch Info */}
+          {/*
           <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
             <div className="flex items-center gap-2 mb-3">
               <img src="/fourmeme.svg" alt="Four.Meme" className="w-5 h-5" />
@@ -300,6 +301,7 @@ const Step1BasicDetails: React.FC<Step1BasicDetailsProps> = ({
               <p>• <span className="font-medium">High visibility</span> on premier meme token platform</p>
             </div>
           </div>
+          */}
         </div>
       </div>
 
