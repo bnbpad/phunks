@@ -133,9 +133,9 @@ const Create = () => {
     <div className="max-w-6xl mx-auto space-y-8">
       {/* Header */}
       <div className="text-center space-y-4">
-        <h1 className="text-5xl font-orbitron font-black text-gray-900">Create Meme Token</h1>
+        <h1 className="text-5xl font-orbitron font-black text-gray-900">Create AI Agent</h1>
         <p className="text-xl text-gray-600 font-exo">
-          Launch your meme token on Four.Meme with AI trading capabilities
+          Create your AI agent on BSC with self-learning capabilities
         </p>
         <div className="flex items-center justify-center gap-2 text-sm text-gray-500 font-exo">
           <div className="w-4 h-4 bg-bsc-500 diamond-shape"></div>

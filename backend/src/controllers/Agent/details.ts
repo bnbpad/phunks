@@ -2,7 +2,7 @@ import { AIDecisions } from "../../database/AIDecison";
 import { AIThesisModel } from "../../database/aiThesis";
 import { Tokens } from "../../database/token";
 import { Trades } from "../../database/action";
-import { EvolutionChange } from "./decision";
+// import { EvolutionChange } from "./decision";
 import { NotFoundError, BadRequestError } from "../../errors";
 
 interface AgentDetailResponse {
@@ -27,7 +27,7 @@ interface AgentDetailResponse {
 
   // Evolution Changes Data (for modal display)
   evolutionChanges: {
-    [activityId: number]: EvolutionChange[];
+    [activityId: number]: any[];
   };
 }
 
@@ -45,7 +45,7 @@ interface AIActivity {
   impact: "High" | "Medium" | "Low";
   metrics: Record<string, string>; // Key-value pairs for metrics (can be empty {})
   status: "active" | "completed" | "monitoring" | "executed" | "processed";
-  evolutionChanges?: EvolutionChange[]; // Only for evolution type activities
+  evolutionChanges?: any[]; // Only for evolution type activities
 }
 
 interface AgentsListResponse {
@@ -102,7 +102,7 @@ export const getAgentsDetail = async (
 
   // Create AI activities from decisions
   const aiActivities: AIActivity[] = [];
-  const evolutionChanges: { [activityId: number]: EvolutionChange[] } = {};
+  const evolutionChanges: { [activityId: number]: any[] } = {};
 
   decisions.forEach((decision: any, index) => {
     const decisionDate = decision.createdAt
@@ -143,7 +143,7 @@ export const getAgentsDetail = async (
 
     // If evolution, add evolution changes
     if (isEvolution && index > 0) {
-      const evolutionChange: EvolutionChange = {
+      const evolutionChange: any = {
         before: decisions[index - 1].tasks || [],
         after: decision.tasks || [],
       };

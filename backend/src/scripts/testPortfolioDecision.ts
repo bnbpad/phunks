@@ -80,7 +80,8 @@ async function main() {
     balances,
     userPositions,
     "MEDIUM",
-    "test"
+    "test",
+    []
   );
 
   console.log("Portfolio decision result:");

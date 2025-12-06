@@ -39,6 +39,7 @@ contract AgentLaunchpad is Initializable, OwnableUpgradeable {
 
     struct AgentRequest {
         address agent;
+        address token;
         Status status;
         uint256 actionId; // 0 -> action, 1 -> upgrade;
     }
@@ -56,6 +57,7 @@ contract AgentLaunchpad is Initializable, OwnableUpgradeable {
     mapping(bytes32 => string) public memories;
     mapping(address => bool) public isAgent;
     mapping(address => address) public tokenToAgent;
+    mapping(address => address) public agentToToken;
 
     mapping(uint256 => AgentInformation) public agentInformation;
 
@@ -72,11 +74,18 @@ contract AgentLaunchpad is Initializable, OwnableUpgradeable {
 
         // we need to create 3 agents for the launchpad to bypass the free minting;
         // a techincal bug which we can request to fix later.
-        IAgentNFT.AgentMetadata memory dummy = IAgentNFT.AgentMetadata("", "", "", "", "", "");
+        IAgentNFT.AgentMetadata memory dummy = IAgentNFT.AgentMetadata(
+            "{}",
+            "Dummy Experience",
+            "",
+            "ipfs://QmAgentAnimation456",
+            "https://gateway.pinata.cloud/ipfs/QmbJWAESqCsf4RFCqEY7jecCashj8usXiyDNfKtZCwwzGb",
+            0x7b7d000000000000000000000000000000000000000000000000000000000000
+        );
         string memory metadataURI = "https://gateway.pinata.cloud/ipfs/QmdQH3hiJjHcGCPgXodBuKmZdKuaTw7dBLGTfWUkcvCooA";
-        IAgentNFT(agentNFT).createAgent(msg.sender, address(0), metadataURI, dummy);
-        IAgentNFT(agentNFT).createAgent(msg.sender, address(0), metadataURI, dummy);
-        IAgentNFT(agentNFT).createAgent(msg.sender, address(0), metadataURI, dummy);
+        IAgentNFT(agentNFT).createAgent(address(this), address(0), metadataURI, dummy);
+        IAgentNFT(agentNFT).createAgent(address(this), address(0), metadataURI, dummy);
+        IAgentNFT(agentNFT).createAgent(address(this), address(0), metadataURI, dummy);
     }
 
     function setAVS(address _avs) public onlyOwner {
@@ -95,13 +104,21 @@ contract AgentLaunchpad is Initializable, OwnableUpgradeable {
         string memory persona,
         string memory experience
     ) public payable returns (address agentAddress) {
-        string memory metadataURI = "";
-        IAgentNFT.AgentMetadata memory metadata = IAgentNFT.AgentMetadata(persona, experience, "", "", "", "");
+        string memory metadataURI = "https://gateway.pinata.cloud/ipfs/QmdQH3hiJjHcGCPgXodBuKmZdKuaTw7dBLGTfWUkcvCooA";
+        IAgentNFT.AgentMetadata memory metadata = IAgentNFT.AgentMetadata(
+            persona,
+            experience,
+            "",
+            "ipfs://QmAgentAnimation456",
+            "https://gateway.pinata.cloud/ipfs/QmbJWAESqCsf4RFCqEY7jecCashj8usXiyDNfKtZCwwzGb",
+            0x7b7d000000000000000000000000000000000000000000000000000000000000
+        );
 
         // create the logic contract for the agent
         agentAddress = address(new Agent(address(this)));
         isAgent[agentAddress] = true;
         tokenToAgent[fourToken] = agentAddress;
+        agentToToken[agentAddress] = fourToken;
 
         uint256 tokenId =
             IAgentNFT(agentNFT).createAgent{value: msg.value}(msg.sender, address(this), metadataURI, metadata);
@@ -113,7 +130,7 @@ contract AgentLaunchpad is Initializable, OwnableUpgradeable {
         require(tokenToAgent[agent] != address(0), "Agent not found");
         address token = tokenToAgent[agent];
         bytes32 hash = keccak256(abi.encode(token, actionId, block.timestamp));
-        requests[hash] = AgentRequest(token, Status.PENDING, actionId);
+        requests[hash] = AgentRequest(agent, token, Status.PENDING, actionId);
         _pendingTxs.add(hash);
         emit AgentActionRequest(hash, token, actionId);
     }
@@ -157,5 +174,14 @@ contract AgentLaunchpad is Initializable, OwnableUpgradeable {
         _pendingTxs.remove(hash);
         memories[hash] = _memory;
         emit AgentActionUpgrade(hash, requests[hash].agent, _memory);
+    }
+
+    function onERC721Received(address operator, address from, uint256 tokenId, bytes memory data)
+        public
+        view
+        returns (bytes4)
+    {
+        // do nothing
+        return this.onERC721Received.selector;
     }
 }

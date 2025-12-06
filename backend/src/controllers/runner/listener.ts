@@ -4,7 +4,7 @@ import { ChainID } from "../../utils/constant";
 import { _getProvider } from "../../utils/contract";
 
 // Contract configuration
-const CONTRACT_ADDRESS = "0x10c0043Dcd70054E8f040fa199FD5B3Ed2Dbb7A3";
+const CONTRACT_ADDRESS = "0xc59b311597d30442814580762d8e860bc3437381";
 const CHAIN_ID: ChainID = 56; // BSC Mainnet
 
 // Event interface matching AgentActionRequest

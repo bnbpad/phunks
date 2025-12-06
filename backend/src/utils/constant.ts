@@ -1,5 +1,5 @@
-import nconf from 'nconf';
-export const blackListedTokens = ['0x0000000000000000000000000000000000000000'];
+import nconf from "nconf";
+export const blackListedTokens = ["0x0000000000000000000000000000000000000000"];
 export const MAX_CAPTION_LENGTH = 100;
 export const REFERRAL_POINTS = 200;
 
@@ -13,9 +13,10 @@ export const totalRequestsUser = 1;
 export const TOKEN_HOLDING_THRESHOLD = 100;
 export const BNBPAD_PRICE = 0.01;
 export const WBNB_TOKEN = {
-  address: '0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c',
-  symbol: 'WBNB',
-  image: 'https://assets.coingecko.com/coins/images/12591/large/binance-coin-logo.png',
+  address: "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c",
+  symbol: "WBNB",
+  image:
+    "https://assets.coingecko.com/coins/images/12591/large/binance-coin-logo.png",
 };
 export const CHAIN_CONFIG: Record<
   number,
@@ -27,13 +28,13 @@ export const CHAIN_CONFIG: Record<
   }
 > = {
   56: {
-    rpc: 'https://binance.llamarpc.com',
-    launchpadProxy: nconf.get('LAUNCHPAD_ADDRESS_BSC'),
-    uiHelper: nconf.get('UI_HELPER_ADDRESS_BSC'),
+    rpc: "https://bsc-dataseed1.bnbchain.org",
+    launchpadProxy: nconf.get("LAUNCHPAD_ADDRESS_BSC"),
+    uiHelper: nconf.get("UI_HELPER_ADDRESS_BSC"),
     adapters: [
       {
-        dex: '',
-        address: nconf.get('ADAPTER_ADDRESS_BSC'),
+        dex: "",
+        address: nconf.get("ADAPTER_ADDRESS_BSC"),
       },
     ],
   },
@@ -42,8 +43,8 @@ export const CHAIN_CONFIG: Record<
 export type ChainID = keyof typeof CHAIN_CONFIG;
 
 export const CHAIN_NAME: Record<number, string> = {
-  1: 'Ethereum',
-  56: 'Bsc',
+  1: "Ethereum",
+  56: "Bsc",
 };
 
 export const KARMA_OFFSET = 1;

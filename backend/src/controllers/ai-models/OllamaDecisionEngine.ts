@@ -120,15 +120,10 @@ export class OllamaDecisionEngine {
     balances: Balance[],
     userPositions: UserPosition[],
     riskTolerance: "LOW" | "MEDIUM" | "HIGH",
-    agentName: string
+    agentName: string,
+    currentTasks: string[]
   ): Promise<AIDecisionResult> {
-    let tasks: string[] = [
-      "Analyze how healthy the current portfolio is (concentration, liquidity risk, volatility, leverage if any).",
-      "Decide for EACH POSITION whether to: BUY_MORE, HOLD, PARTIAL_SELL, or CLOSE.",
-      "Optionally recommend NEW entries in tokens from the market list if there is a strong opportunity.",
-      "Respect risk tolerance and the available USDT balance.",
-      "Focus on realistic, executable actions within current liquidity and volatility.",
-    ];
+    let tasks: string[] = currentTasks;
     const previousDecision = await AIDecisions.find({ agentId: agentName })
       .sort({ createdAt: -1 })
       .limit(5);

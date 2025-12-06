@@ -15,13 +15,13 @@ contract DeployScript is Script {
         vm.startBroadcast();
 
         // Deploy contracts
-        agentNFT = new AgentNFT();
+        // agentNFT = new AgentNFT();
         agentLaunchpad = new AgentLaunchpad();
 
         // Initialize contracts
         address deployer = msg.sender; // Use the deployer as owner
-        agentNFT.initialize("Phunks", "Punks", deployer);
-        agentLaunchpad.initialize(deployer, address(agentNFT));
+        // agentNFT.initialize("Phunks", "Punks", deployer);
+        agentLaunchpad.initialize(deployer, address(0xd7Deb29ddBB13607375Ce50405A574AC2f7d978d));
 
         // Note: AgentLaunchpad needs agentNFT to be set, but there's no setter in the contract
         // You may need to add a setAgentNFT function to AgentLaunchpad or set it in the constructor
@@ -31,7 +31,9 @@ contract DeployScript is Script {
 
         address token = address(0xe29315aF2cC7e4D69c50A962829B2C122ce94444);
 
-        agentLaunchpad.createAgent(token, "Buy 1000 ETH", "Buy 1000 ETH", "I am a trader", "I am a trader");
+        agentLaunchpad.createAgent{value: 0.01 ether}(
+            token, "Buy 1000 ETH", "Buy 1000 ETH", "I am a trader", "I am a trader"
+        );
 
         agentLaunchpad.sendRequest(token, 1);
         agentLaunchpad.sendRequest(token, 0);
