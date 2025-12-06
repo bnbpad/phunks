@@ -329,6 +329,63 @@ Provide your analysis and recommendation.`
     );
   }
 
+  public async getPortfolioDecision(
+    marketDataArray: MarketAnalysis[],
+    balance: Balance[],
+    agentPositions: Position[],
+    riskTolerance: "LOW" | "MEDIUM" | "HIGH",
+    currentGoals: string,
+    currentTasks: string
+  ): Promise<string[]> {
+    const newTaskPrompt = [
+      "You are an expert in generating evolving portfolio-management task lists.",
+      "",
+      "INPUT:",
+      // `1. current goals: ${previousDecisionList}`,
+      `1. Previous task list: ${currentTasks}`,
+      `2. Long-term goals: ${currentGoals}`,
+
+      "",
+      "INSTRUCTIONS:",
+      "- Read the previous decision to understand what actions were taken (e.g., HOLD, BUY, diversification attempts, risk reductions, etc.)",
+      "- Read the previous task list to understand the prior evaluation framework",
+      "- Now generate a NEW set of tasks for the next evaluation cycle",
+      "- CRITICAL: The output must contain MAXIMUM 6 tasks (no more than 6)",
+      "- CRITICAL: Approximately 50% of the previous tasks should be KEPT (unchanged or slightly modified) to show continuity and evolution",
+      "- CRITICAL: Approximately 50% of the tasks should be NEW or significantly changed to reflect new priorities and lessons learned",
+      "- The tasks must be similar in style and structure to the historical example tasks the user provided",
+      "- The tasks must evolve *logically* from the previous decision and previous tasks, reflecting:",
+      "  • New priorities",
+      "  • Follow-ups",
+      "  • Adjusted focus",
+      "  • Lessons from prior actions",
+      "- The tasks must remain high-level but actionable, suitable for a recurring portfolio-review loop",
+      "- Do NOT output decisions, JSON, actions, or portfolio commentary",
+      "- Output ONLY the new task list (no explanations, no intro text)",
+      "",
+      "OUTPUT FORMAT:",
+      "Return ONLY a task list (one task per line, up to 6 tasks maximum), written clearly and concisely. Do NOT number the tasks.",
+      "",
+      "Example structure your output must follow (format only, content must be newly generated):",
+      "Analyze the updated portfolio structure…",
+      "Reevaluate existing position allocations…",
+      "Assess new diversification opportunities…",
+      "Review risk levels and adjust stop-loss strategy…",
+      "Recommend new entries only if…",
+      "Monitor market conditions for…",
+      "",
+      "Only output the new task list (maximum 6 tasks, with ~50% kept from previous and ~50% new/changed).",
+    ].join("\n");
+
+    const response = await this.callOpenAI(newTaskPrompt);
+    const tasks = this.parseTaskList(response.trim());
+    return tasks;
+  }
+
+  private parseTaskList(taskString: string): string[] {
+    return taskString.split("\n").map((line) => line.trim());
+  }
+
   /**
    * Build risk assessment prompt
    */

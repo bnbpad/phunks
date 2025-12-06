@@ -4,13 +4,14 @@ import { ChainID } from "../../utils/constant";
 import { _getProvider } from "../../utils/contract";
 
 // Contract configuration
-const CONTRACT_ADDRESS = "0xc59b311597d30442814580762d8e860bc3437381";
+const CONTRACT_ADDRESS = "0xc8e53edebd040e8d9d194082fc2cbc67465e9c7c";
 const CHAIN_ID: ChainID = 56; // BSC Mainnet
 
 // Event interface matching AgentActionRequest
 export interface AgentActionRequestEvent {
   hash: string;
   agentAddress: string;
+  tokenAddress: string;
   actionId: bigint;
   blockNumber: number;
   transactionHash: string;
@@ -78,6 +79,7 @@ export class AgentRunner {
         const eventData: AgentActionRequestEvent = {
           hash: hashString,
           agentAddress: agentAddress,
+          tokenAddress: request.token,
           actionId: actionId,
           blockNumber: blockNumber,
           transactionHash: "", // Not available from getPendingTxs

@@ -11,6 +11,7 @@ import {
 
 import { BadRequestError } from "../../errors";
 import axios from "axios";
+import { AIDecisions } from "src/database/AIDecison";
 
 /**
  * Validate the token creation
@@ -234,6 +235,13 @@ export const saveFourMemeToken = async (
         ...body.aiThesis,
         tokenAddress: tokenAddress.toLowerCase(),
         chainId: chainId,
+      });
+
+      await AIDecisions.insertOne({
+        agentId: tokenAddress.toLowerCase(),
+        tasks: body.aiThesis.memory,
+        decision: body.aiThesis.goals,
+        prompt: "",
       });
     }
 

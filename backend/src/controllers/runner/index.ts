@@ -1,19 +1,20 @@
 import { AIDecisions } from "src/database/AIDecison";
-import { OllamaDecisionEngine } from "../ai-models/OllamaDecisionEngine";
 import { AgentActionRequestHandler, AgentRunner } from "./listener";
 import { AgentResponder } from "./responder";
+import { AIThesisModel } from "src/database/aiThesis";
+import { OpenAIDecisionEngine } from "../ai-models/OpenAIDecisionEngine";
 
 const run = async () => {
   const runner = new AgentRunner(1000);
   const responder = new AgentResponder();
-  // const openapi = new OpenAIDecisionEngine();
+  const openapi = new OpenAIDecisionEngine();
 
   // Define event handler (can be sync or async)
   const handler: AgentActionRequestHandler = async (event) => {
     // Your custom logic here - runs synchronously
     console.log("Processing AgentActionRequest:", {
       hash: event.hash,
-      agentAddress: event.agentAddress,
+      tokenAddress: event.agentAddress,
       actionId: event.actionId.toString(),
     });
 
@@ -21,33 +22,35 @@ const run = async () => {
       if (event.actionId.toString() == "1") {
         // perform upgrade
         console.log("Upgrade action");
-        const engine = new OllamaDecisionEngine();
+        // const engine = new OllamaDecisionEngine();
 
-        const decision = await AIDecisions.findOne({
-          agentId: event.agentAddress.toLowerCase(),
+        const thesis = await AIThesisModel.findOne({
+          tokenAddress: event.agentAddress.toLowerCase(),
         })
           .sort({ createdAt: -1 })
           .exec();
 
-        console.log("decision", decision?.toJSON());
-        if (!decision) return;
+        if (!thesis) return;
 
-        console.log("currentTasks", decision?.toJSON());
-
-        const newdecision = await engine.getPortfolioDecision(
+        const newdecision = await openapi.getPortfolioDecision(
           [],
           [],
           [],
           "MEDIUM",
-          "test",
-          decision.tasks
+          thesis.goals,
+          thesis.memory
         );
 
         console.log("newdecision", newdecision);
 
-        await AIDecisions.create({
-          ...newdecision.decision,
-          decision: newdecision,
+        await thesis.set("tasks", newdecision);
+        await thesis.save();
+
+        await AIDecisions.insertOne({
+          agentId: event.agentAddress.toLowerCase(),
+          tasks: newdecision,
+          decision: thesis.goals,
+          prompt: "",
         });
 
         // const tx = await responder.respondWithUpgrade({

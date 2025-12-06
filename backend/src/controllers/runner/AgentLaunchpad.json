@@ -185,6 +185,13 @@
     "type": "function"
   },
   {
+    "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "name": "agentToToken",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "avs",
     "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
@@ -200,8 +207,10 @@
       { "internalType": "string", "name": "experience", "type": "string" }
     ],
     "name": "createAgent",
-    "outputs": [],
-    "stateMutability": "nonpayable",
+    "outputs": [
+      { "internalType": "address", "name": "agentAddress", "type": "address" }
+    ],
+    "stateMutability": "payable",
     "type": "function"
   },
   {
@@ -212,7 +221,12 @@
       {
         "components": [
           { "internalType": "address", "name": "agent", "type": "address" },
-          { "internalType": "uint256", "name": "status", "type": "uint256" },
+          { "internalType": "address", "name": "token", "type": "address" },
+          {
+            "internalType": "enum AgentLaunchpad.Status",
+            "name": "status",
+            "type": "uint8"
+          },
           { "internalType": "uint256", "name": "actionId", "type": "uint256" }
         ],
         "internalType": "struct AgentLaunchpad.AgentRequest[]",
@@ -241,9 +255,28 @@
     "type": "function"
   },
   {
+    "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "name": "isAgent",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
     "name": "memories",
     "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "operator", "type": "address" },
+      { "internalType": "address", "name": "from", "type": "address" },
+      { "internalType": "uint256", "name": "tokenId", "type": "uint256" },
+      { "internalType": "bytes", "name": "data", "type": "bytes" }
+    ],
+    "name": "onERC721Received",
+    "outputs": [{ "internalType": "bytes4", "name": "", "type": "bytes4" }],
     "stateMutability": "view",
     "type": "function"
   },
@@ -266,7 +299,12 @@
     "name": "requests",
     "outputs": [
       { "internalType": "address", "name": "agent", "type": "address" },
-      { "internalType": "uint256", "name": "status", "type": "uint256" },
+      { "internalType": "address", "name": "token", "type": "address" },
+      {
+        "internalType": "enum AgentLaunchpad.Status",
+        "name": "status",
+        "type": "uint8"
+      },
       { "internalType": "uint256", "name": "actionId", "type": "uint256" }
     ],
     "stateMutability": "view",
@@ -311,6 +349,13 @@
     "name": "setAVS",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "name": "tokenToAgent",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
     "type": "function"
   },
   {
