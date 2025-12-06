@@ -21,7 +21,7 @@ interface IAgentNFT {
         address logicAddress,
         string memory metadataURI,
         AgentMetadata memory extendedMetadata
-    ) external returns (uint256);
+    ) external payable returns (uint256);
 }
 
 contract AgentLaunchpad is Initializable, OwnableUpgradeable {
@@ -31,9 +31,15 @@ contract AgentLaunchpad is Initializable, OwnableUpgradeable {
 
     address public agentNFT;
 
+    enum Status {
+        UNREGISTERED,
+        PENDING,
+        COMPLETED
+    }
+
     struct AgentRequest {
         address agent;
-        uint256 status; // 0 -> unregistered, 1 -> pending, 2 -> completed
+        Status status;
         uint256 actionId; // 0 -> action, 1 -> upgrade;
     }
 
@@ -63,10 +69,23 @@ contract AgentLaunchpad is Initializable, OwnableUpgradeable {
     function initialize(address _owner, address _agentNFT) public initializer {
         __Ownable_init(_owner);
         agentNFT = _agentNFT;
+
+        // we need to create 3 agents for the launchpad to bypass the free minting;
+        // a techincal bug which we can request to fix later.
+        IAgentNFT.AgentMetadata memory dummy = IAgentNFT.AgentMetadata("", "", "", "", "", "");
+        string memory metadataURI = "https://gateway.pinata.cloud/ipfs/QmdQH3hiJjHcGCPgXodBuKmZdKuaTw7dBLGTfWUkcvCooA";
+        IAgentNFT(agentNFT).createAgent(msg.sender, address(0), metadataURI, dummy);
+        IAgentNFT(agentNFT).createAgent(msg.sender, address(0), metadataURI, dummy);
+        IAgentNFT(agentNFT).createAgent(msg.sender, address(0), metadataURI, dummy);
     }
 
     function setAVS(address _avs) public onlyOwner {
         avs = _avs;
+    }
+
+    modifier onlyAVS() {
+        require(msg.sender == avs, "Not authorized");
+        _;
     }
 
     function createAgent(
@@ -75,27 +94,26 @@ contract AgentLaunchpad is Initializable, OwnableUpgradeable {
         string memory brainMemory,
         string memory persona,
         string memory experience
-    ) public returns (address agent) {
+    ) public payable returns (address agentAddress) {
         string memory metadataURI = "";
         IAgentNFT.AgentMetadata memory metadata = IAgentNFT.AgentMetadata(persona, experience, "", "", "", "");
 
         // create the logic contract for the agent
-        address logicAddress = address(new Agent(address(this)));
-        isAgent[logicAddress] = true;
-        tokenToAgent[fourToken] = logicAddress;
+        agentAddress = address(new Agent(address(this)));
+        isAgent[agentAddress] = true;
+        tokenToAgent[fourToken] = agentAddress;
 
-        uint256 tokenId = IAgentNFT(agentNFT).createAgent(msg.sender, logicAddress, metadataURI, metadata);
+        uint256 tokenId =
+            IAgentNFT(agentNFT).createAgent{value: msg.value}(msg.sender, address(this), metadataURI, metadata);
         agentInformation[tokenId] = AgentInformation(msg.sender, fourToken, goal, brainMemory);
-        emit AgentCreated(tokenId, msg.sender, logicAddress, metadataURI);
-
-        agent = logicAddress;
+        emit AgentCreated(tokenId, msg.sender, agentAddress, metadataURI);
     }
 
     function sendRequest(address agent, uint256 actionId) public {
         require(tokenToAgent[agent] != address(0), "Agent not found");
         address token = tokenToAgent[agent];
         bytes32 hash = keccak256(abi.encode(token, actionId, block.timestamp));
-        requests[hash] = AgentRequest(token, 1, actionId);
+        requests[hash] = AgentRequest(token, Status.PENDING, actionId);
         _pendingTxs.add(hash);
         emit AgentActionRequest(hash, token, actionId);
     }
@@ -109,21 +127,33 @@ contract AgentLaunchpad is Initializable, OwnableUpgradeable {
         return (hashes, requestsList);
     }
 
-    function respondWithAction(bytes32 hash, address to, bytes memory data, uint256 value) public {
-        require(requests[hash].status == 1, "Request not found");
+    /**
+     * @dev Respond with an action to the agent
+     * @param hash The hash of the request
+     * @param to The address to send the action to
+     * @param data The data to send to the agent
+     * @param value The value to send to the agent
+     * @notice The action is executed by the agent and the response is emitted
+     */
+    function respondWithAction(bytes32 hash, address to, bytes memory data, uint256 value) public onlyAVS {
+        require(requests[hash].status == Status.PENDING, "Request not found");
         require(requests[hash].actionId == 0, "Invalid action ID");
-        require(msg.sender == avs, "Not authorized");
-        requests[hash].status = 2;
+        requests[hash].status = Status.COMPLETED;
         _pendingTxs.remove(hash);
         Agent(payable(requests[hash].agent)).executeAction(to, data, value);
         emit AgentActionResponse(hash, requests[hash].agent, data, to, value);
     }
 
-    function respondWithUpgrade(bytes32 hash, string memory _memory) public {
-        require(requests[hash].status == 1, "Request not found");
+    /**
+     * @dev Respond with an upgrade to the agent
+     * @param hash The hash of the request
+     * @param _memory The memory to upgrade the agent with
+     * @notice The agent is upgraded and the memory is stored
+     */
+    function respondWithUpgrade(bytes32 hash, string memory _memory) public onlyAVS {
+        require(requests[hash].status == Status.PENDING, "Request not found");
         require(requests[hash].actionId == 1, "Invalid action ID");
-        require(msg.sender == avs, "Not authorized");
-        requests[hash].status = 2;
+        requests[hash].status = Status.COMPLETED;
         _pendingTxs.remove(hash);
         memories[hash] = _memory;
         emit AgentActionUpgrade(hash, requests[hash].agent, _memory);

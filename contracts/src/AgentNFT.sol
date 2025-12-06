@@ -42,7 +42,7 @@ contract AgentNFT is ERC721EnumerableUpgradeable, OwnableUpgradeable, UUPSUpgrad
     // CONSTANTS
     // ============================================
 
-    uint256 public constant MINT_FEE = 0.01 ether;
+    uint256 public constant MINT_FEE = 0 ether;
 
     // ============================================
     // STATE VARIABLES
@@ -116,7 +116,7 @@ contract AgentNFT is ERC721EnumerableUpgradeable, OwnableUpgradeable, UUPSUpgrad
         __ERC721Enumerable_init();
 
         treasuryAddress = treasury;
-        freeMintsPerUser = 3;
+        freeMintsPerUser = 0;
     }
 
     // ============================================
@@ -140,18 +140,18 @@ contract AgentNFT is ERC721EnumerableUpgradeable, OwnableUpgradeable, UUPSUpgrad
         uint256 freeMintsRemaining =
             totalFreeMints > freeMintsClaimed[msg.sender] ? totalFreeMints - freeMintsClaimed[msg.sender] : 0;
 
-        // if (freeMintsRemaining > 0) {
-        //     require(to == msg.sender, "Free mints can only be minted to self");
-        //     isFreeMint[_tokenIdCounter + 1] = true;
-        //     freeMintsClaimed[msg.sender]++;
-        // } else {
-        //     // Require payment
-        //     require(msg.value == MINT_FEE, "Incorrect fee");
-        //     // Validate and send fee to treasury
-        //     require(treasuryAddress != address(0), "Treasury not set");
-        //     (bool success,) = payable(treasuryAddress).call{value: msg.value}("");
-        //     require(success, "Treasury transfer failed");
-        // }
+        if (freeMintsRemaining > 0) {
+            require(to == msg.sender, "Free mints can only be minted to self");
+            isFreeMint[_tokenIdCounter + 1] = true;
+            freeMintsClaimed[msg.sender]++;
+        } else {
+            // Require payment
+            require(msg.value == MINT_FEE, "Incorrect fee");
+            // Validate and send fee to treasury
+            require(treasuryAddress != address(0), "Treasury not set");
+            (bool success,) = payable(treasuryAddress).call{value: msg.value}("");
+            require(success, "Treasury transfer failed");
+        }
 
         // Mint NFT
         uint256 tokenId = ++_tokenIdCounter;
@@ -207,7 +207,7 @@ contract AgentNFT is ERC721EnumerableUpgradeable, OwnableUpgradeable, UUPSUpgrad
      * @dev Update logic address for an agent
      * @dev Logic address must be either zero address or a contract address
      */
-    function setLogicAddress(uint256 tokenId, address) external onlyTokenOwner(tokenId) {
+    function setLogicAddress(uint256, address) external pure {
         require(false, "Logic is updated by the launchpad contract");
     }
 
