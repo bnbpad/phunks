@@ -373,42 +373,31 @@ const AgentDashboard = () => {
           {/* Activity Feed */}
           <div className="space-y-3 max-h-[700px] overflow-y-auto">
             {aiActivities.map((activity) => (
-              <div key={activity.id} className={`rounded-xl p-4 border-l-4 hover:shadow-md transition-all ${
-                activity.status === 'active'
-                  ? 'bg-gradient-to-r from-bsc-50 to-purple-50 border-l-bsc-500'
-                  : activity.type === 'evolution'
+              <div key={activity.id} className={`rounded-xl p-4 border-l-4 hover:shadow-md transition-all ${activity.status === 'active'
+                ? 'bg-gradient-to-r from-bsc-50 to-purple-50 border-l-bsc-500'
+                : activity.type === 'evolution'
                   ? 'bg-purple-50 border-l-purple-500'
                   : activity.type === 'learning'
-                  ? 'bg-blue-50 border-l-blue-500'
-                  : activity.type === 'trade'
-                  ? 'bg-bsc-50 border-l-bsc-500'
-                  : activity.type === 'success'
-                  ? 'bg-green-50 border-l-green-500'
-                  : activity.type === 'warning'
-                  ? 'bg-yellow-50 border-l-yellow-500'
-                  : 'bg-gray-50 border-l-gray-500'
-              }`}>
+                    ? 'bg-blue-50 border-l-blue-500'
+                    : activity.type === 'trade'
+                      ? 'bg-bsc-50 border-l-bsc-500'
+                      : activity.type === 'success'
+                        ? 'bg-green-50 border-l-green-500'
+                        : activity.type === 'warning'
+                          ? 'bg-yellow-50 border-l-yellow-500'
+                          : 'bg-gray-50 border-l-gray-500'
+                }`}>
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex items-center gap-3">
-                    <div className={`w-2 h-2 rounded-full ${
-                      activity.status === 'active' ? 'bg-bsc-500 animate-pulse' :
+                    <div className={`w-2 h-2 rounded-full ${activity.status === 'active' ? 'bg-bsc-500 animate-pulse' :
                       activity.type === 'evolution' ? 'bg-purple-500' :
-                      activity.type === 'learning' ? 'bg-blue-500' :
-                      activity.type === 'trade' ? 'bg-bsc-500' :
-                      activity.type === 'success' ? 'bg-green-500' :
-                      activity.type === 'warning' ? 'bg-yellow-500' :
-                      'bg-gray-500'
-                    }`}></div>
+                        activity.type === 'learning' ? 'bg-blue-500' :
+                          activity.type === 'trade' ? 'bg-bsc-500' :
+                            activity.type === 'success' ? 'bg-green-500' :
+                              activity.type === 'warning' ? 'bg-yellow-500' :
+                                'bg-gray-500'
+                      }`}></div>
                     <h3 className="font-semibold text-gray-900 font-exo">{activity.title}</h3>
-                    <span className={`px-2 py-1 rounded-full text-xs font-exo font-medium ${
-                      activity.impact === 'High'
-                        ? 'bg-red-100 text-red-600'
-                        : activity.impact === 'Medium'
-                        ? 'bg-yellow-100 text-yellow-600'
-                        : 'bg-gray-100 text-gray-600'
-                    }`}>
-                      {activity.impact}
-                    </span>
                     {activity.status === 'active' && (
                       <span className="px-2 py-1 bg-bsc-500 text-white rounded-full text-xs font-exo font-medium animate-pulse">
                         🔥 {t('ai.status.active')}
@@ -420,23 +409,6 @@ const AgentDashboard = () => {
 
                 <p className="text-sm text-gray-600 font-exo mb-3">{activity.description}</p>
 
-                {/* Metrics Grid - Only show if there are metrics */}
-                {Object.keys(activity.metrics).length > 0 && (
-                  <div className="grid grid-cols-2 gap-3 text-xs">
-                    {Object.entries(activity.metrics).map(([key, value]) => (
-                      <div key={key} className="bg-white rounded-lg p-2">
-                        <span className="text-gray-500 font-exo capitalize">{key}</span>
-                        <p className={`font-semibold font-exo ${
-                          value.toString().includes('+') ? 'text-green-600' :
-                          value.toString().includes('-') ? 'text-red-600' :
-                          'text-gray-900'
-                        }`}>
-                          {value}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                )}
 
                 {/* Evolution Changes - Only for evolution type activities */}
                 {activity.type === 'evolution' && activity.evolutionChanges && (
@@ -445,18 +417,6 @@ const AgentDashboard = () => {
                     onShowChanges={() => handleShowEvolutionChanges(activity)}
                   />
                 )}
-
-                {/* Status indicator */}
-                <div className="flex items-center gap-2 mt-3 text-xs">
-                  <div className={`w-2 h-2 rounded-full ${
-                    activity.status === 'active' ? 'bg-green-500 animate-pulse' :
-                    activity.status === 'completed' ? 'bg-green-500' :
-                    activity.status === 'monitoring' ? 'bg-yellow-500' :
-                    activity.status === 'executed' ? 'bg-blue-500' :
-                    'bg-gray-500'
-                  }`}></div>
-                  <span className="text-gray-500 font-exo capitalize">{t(`ai.status.${activity.status}`)}</span>
-                </div>
               </div>
             ))}
           </div>

@@ -124,12 +124,10 @@ export const getAgentsDetail = async (
     const activity: AIActivity = {
       id: activityId,
       time,
-      title: isEvolution
-        ? "Task List Evolution"
-        : decision.prompt
-          ? "AI Decision Made"
-          : "Activity Update",
-      description: decision.prompt || "Agent activity recorded",
+      title: isEvolution ? "AI Evolution" : "Intelligent Decision Made",
+      description: isEvolution
+        ? "Agent has learned to trade more effectively based on market conditions."
+        : "Agent has made a decision to trade based on it's own intelligence.",
       type: isEvolution ? "evolution" : "info",
       impact: "Medium" as const,
       metrics: {

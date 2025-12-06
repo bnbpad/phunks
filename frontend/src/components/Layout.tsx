@@ -13,13 +13,13 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   ]
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[#FFFFee]">
       {/* Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-bsc-500 diamond-shape"></div>
+              {/* <div className="w-8 h-8 bg-bsc-500 diamond-shape"></div> */}
               <div>
                 <h1 className="text-xl font-orbitron font-bold text-gray-900">Phunks</h1>
                 <p className="text-xs text-bsc-600 font-exo">AI Agents on BSC</p>
