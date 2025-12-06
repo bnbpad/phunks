@@ -132,14 +132,25 @@ const Create = () => {
   return (
     <div className="max-w-6xl mx-auto space-y-8">
       {/* Header */}
-      <div className="text-center space-y-4">
+      <div className="text-center space-y-6">
         <h1 className="text-5xl font-orbitron font-black text-gray-900">Create AI Agent</h1>
         <p className="text-xl text-gray-600 font-exo">
           Create your AI agent on BSC with self-learning capabilities
         </p>
+
+        {/* Four.Meme Launch Banner */}
+        <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-xl p-4 max-w-xl mx-auto">
+          <div className="flex items-center justify-center gap-3">
+            <img src="/fourmeme.svg" alt="Four.Meme" className="w-6 h-6" />
+            <h2 className="text-lg font-orbitron font-bold text-purple-900">
+              Launching on Four.Meme DEX
+            </h2>
+          </div>
+        </div>
+
         <div className="flex items-center justify-center gap-2 text-sm text-gray-500 font-exo">
           <div className="w-4 h-4 bg-bsc-500 diamond-shape"></div>
-          <span>Powered by BNB Smart Chain & Four.Meme</span>
+          <span>Powered by BNB Smart Chain</span>
         </div>
       </div>
 

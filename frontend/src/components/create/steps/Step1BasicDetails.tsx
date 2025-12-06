@@ -286,14 +286,18 @@ const Step1BasicDetails: React.FC<Step1BasicDetailsProps> = ({
             className="hidden"
           />
 
-          {/* FourMeme Info */}
+          {/* Four.Meme Launch Info */}
           <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
-            <h4 className="font-exo font-medium text-purple-900 mb-2">🎯 Four.Meme Integration</h4>
+            <div className="flex items-center gap-2 mb-3">
+              <img src="/fourmeme.svg" alt="Four.Meme" className="w-5 h-5" />
+              <h4 className="font-exo font-semibold text-purple-900">Launching on Four.Meme DEX</h4>
+            </div>
             <div className="space-y-1 text-sm text-purple-700 font-exo">
-              <p>• Token will be listed on Four.Meme DEX</p>
-              <p>• Fixed tokenomics: 1B supply, 24 BNB pool</p>
-              <p>• 0.25% trading fees, BNB base pair</p>
-              <p>• Immediate trading after launch</p>
+              <p>• <span className="font-medium">Automatic listing</span> on Four.Meme marketplace</p>
+              <p>• <span className="font-medium">Fixed tokenomics:</span> 1B supply, 24 BNB liquidity pool</p>
+              <p>• <span className="font-medium">Low fees:</span> 0.25% trading fees, BNB base pair</p>
+              <p>• <span className="font-medium">Instant trading</span> available immediately after launch</p>
+              <p>• <span className="font-medium">High visibility</span> on premier meme token platform</p>
             </div>
           </div>
         </div>
