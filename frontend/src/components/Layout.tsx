@@ -6,12 +6,12 @@ import { ConnectWallet } from './ConnectWallet'
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation()
-  
+
   const navItems = [
     { path: '/traders', icon: Users, label: 'Agents' },
     { path: '/arena', icon: Trophy, label: 'Leaderboard' },
   ]
-  
+
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
@@ -22,7 +22,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
               <div className="w-8 h-8 bg-bsc-500 diamond-shape"></div>
               <div>
                 <h1 className="text-xl font-orbitron font-bold text-gray-900">Phunks</h1>
-                <p className="text-xs text-bsc-600 font-exo">AI Trading on BSC</p>
+                <p className="text-xs text-bsc-600 font-exo">AI Agents on BSC</p>
               </div>
             </Link>
 
@@ -34,11 +34,10 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                   <Link
                     key={item.path}
                     to={item.path}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-md transition-colors ${
-                      isActive
-                        ? 'bg-bsc-50 text-bsc-700 border border-bsc-200'
-                        : 'text-gray-600 hover:text-bsc-700 hover:bg-bsc-50'
-                    }`}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-md transition-colors ${isActive
+                      ? 'bg-bsc-50 text-bsc-700 border border-bsc-200'
+                      : 'text-gray-600 hover:text-bsc-700 hover:bg-bsc-50'
+                      }`}
                   >
                     <Icon className="w-4 h-4" />
                     <span className="text-sm font-exo font-medium">{item.label}</span>

@@ -48,7 +48,7 @@ const Lab = () => {
       image: '/avatars/avatar8.png'
     },
   ]
-  
+
   const features = [
     {
       icon: Brain,
@@ -71,7 +71,7 @@ const Lab = () => {
       description: t('homePage.features.analytics.description'),
     },
   ]
-  
+
   return (
     <div className="space-y-16">
       {/* Hero Section */}
@@ -79,9 +79,9 @@ const Lab = () => {
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div className="space-y-8">
             <div className="inline-block">
-              <span className="px-4 py-2 bg-bsc-50 border border-bsc-200 rounded-full text-bsc-700 text-sm font-exo font-medium">
+              {/* <span className="px-4 py-2 bg-bsc-50 border border-bsc-200 rounded-full text-bsc-700 text-sm font-exo font-medium">
                 {t('homePage.hero.badge')}
-              </span>
+              </span> */}
             </div>
 
             <h1 className="text-4xl md:text-5xl font-orbitron font-black leading-tight text-gray-900">
@@ -142,7 +142,7 @@ const Lab = () => {
           </div>
         </div>
       </section>
-      
+
       {/* Features Section */}
       <section className="space-y-12 py-16">
         <div className="text-center space-y-4">
@@ -177,7 +177,7 @@ const Lab = () => {
           })}
         </div>
       </section>
-      
+
       {/* Featured Agents */}
       <section className="space-y-8 py-16">
         <div className="flex items-center justify-between">
