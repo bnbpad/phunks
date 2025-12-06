@@ -147,7 +147,7 @@ const Create = () => {
         </div>
 
         <div className="flex items-center justify-center gap-2 text-sm text-gray-500 font-exo">
-          <div className="w-4 h-4 bg-bsc-500 diamond-shape"></div>
+          <img src="/bsc.svg" alt="BNB Smart Chain" className="w-4 h-4" />
           <span>Powered by BNB Smart Chain</span>
         </div>
       </div>
