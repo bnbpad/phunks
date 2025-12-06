@@ -29,14 +29,12 @@ contract DeployScript is Script {
         address avs = address(0xA1a629d832972DB3b84A4f5Fa42d50eFF7c8F8dE);
         agentLaunchpad.setAVS(avs);
 
-        address token = address(0xe29315aF2cC7e4D69c50A962829B2C122ce94444);
-
-        agentLaunchpad.createAgent{value: 0.02 ether}(
-            token, "Buy 1000 ETH", "Buy 1000 ETH", "I am a trader", "I am a trader"
-        );
-
-        agentLaunchpad.sendRequest(token, 1);
-        agentLaunchpad.sendRequest(token, 0);
+        // address token = address(0xe29315aF2cC7e4D69c50A962829B2C122ce94444);
+        // agentLaunchpad.createAgent{value: 0.02 ether}(
+        //     token, "Buy 1000 ETH", "Buy 1000 ETH", "I am a trader", "I am a trader"
+        // );
+        // agentLaunchpad.sendRequest(token, 1);
+        // agentLaunchpad.sendRequest(token, 0);
 
         vm.stopBroadcast();
     }

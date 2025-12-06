@@ -5,7 +5,7 @@ import AgentLaunchpadABI from "./abi/AgentLaunchpad.json";
 export const config = {
   // API Configuration
   api: {
-    baseURL: 'https://fd32c497428a.ngrok-free.app',
+    baseURL: "https://fd32c497428a.ngrok-free.app",
     // baseURL: "http://localhost:5005",
   },
 
@@ -34,7 +34,7 @@ export const config = {
       abi: TokenManagerABI,
     },
     agentLaunchpad: {
-      address: "0x30A881d092e67c3fF604e1A85C2A7a0019C78741",
+      address: "0x92B1AF102247Ea2fB71c51157A13bb168A35B9D9",
       abi: AgentLaunchpadABI,
     },
     agentNFT: "0x742d35Cc6634C0532925a3b8D91d99e2c4b851E8",
