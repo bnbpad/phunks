@@ -1,7 +1,7 @@
 import { AIDecisions } from "../../database/AIDecison";
 import { AIThesisModel } from "../../database/aiThesis";
 import { Tokens } from "../../database/token";
-import { Trades } from "../../database/action";
+import { Actions, IAction } from "../../database/action";
 // import { EvolutionChange } from "./decision";
 import { NotFoundError, BadRequestError } from "../../errors";
 
@@ -20,7 +20,7 @@ interface AgentDetailResponse {
   experiences: string;
 
   // Recent Trades (displayed in right sidebar)
-  recentTrades: Trade[];
+  recentTrades: any[];
 
   // AI Activities (displayed in main evolution section)
   aiActivities: AIActivity[];
@@ -84,7 +84,7 @@ export const getAgentsDetail = async (
     AIDecisions.find({ agentId: normalizedAddress })
       .sort({ createdAt: -1 })
       .lean(),
-    Trades.find({ tokenAddress: normalizedAddress })
+    Actions.find({ tokenAddress: normalizedAddress })
       .sort({ createdAt: -1 })
       .limit(10)
       .lean(),
@@ -95,16 +95,12 @@ export const getAgentsDetail = async (
   }
 
   // Map recent trades
-  const recentTrades: Trade[] = trades.map((trade, index) => ({
-    id: index + 1,
-    description: `${trade.action} ${trade.symbol} - ${trade.amount} @ $${trade.price.toFixed(4)}`,
-  }));
 
   // Create AI activities from decisions
   const aiActivities: AIActivity[] = [];
   const evolutionChanges: { [activityId: number]: any[] } = {};
 
-  decisions.forEach((decision: any, index) => {
+  decisions.forEach((decision: any, index: number) => {
     const decisionDate = decision.createdAt
       ? new Date(decision.createdAt)
       : new Date();
@@ -168,7 +164,7 @@ export const getAgentsDetail = async (
     personal: aiThesis?.persona || "",
     experiences: aiThesis?.experience || "",
 
-    recentTrades,
+    recentTrades: trades as any[],
     aiActivities,
     evolutionChanges,
   };
@@ -227,11 +223,10 @@ export const getAllAgents = async (
 
   // Fetch trades and decisions for all agents in parallel
   const [tradesByAgent, decisionsByAgent] = await Promise.all([
-    Trades.aggregate([
+    Actions.aggregate([
       {
         $match: {
           tokenAddress: { $in: tokenAddresses },
-          status: "completed",
         },
       },
       {
@@ -260,10 +255,10 @@ export const getAllAgents = async (
 
   // Create maps for quick lookup
   const tradesMap = new Map(
-    tradesByAgent.map((item) => [item._id.toLowerCase(), item])
+    tradesByAgent.map((item: any) => [item._id.toLowerCase(), item])
   );
   const decisionsMap = new Map(
-    decisionsByAgent.map((item) => [item._id.toLowerCase(), item])
+    decisionsByAgent.map((item: any) => [item._id.toLowerCase(), item])
   );
 
   // Calculate agent summaries
@@ -272,12 +267,12 @@ export const getAllAgents = async (
     const trades = tradesMap.get(tokenAddress);
     const decisions = decisionsMap.get(tokenAddress);
 
-    const tradeList = (trades?.trades || []).sort((a: any, b: any) => {
+    const tradeList = ((trades as any)?.trades || []).sort((a: any, b: any) => {
       const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
       const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
       return dateA - dateB;
     });
-    const tradesCount = trades?.count || 0;
+    const tradesCount = (trades as any)?.count || 0;
 
     // Calculate PnL from completed trades
     // Simple calculation: sum of (sell price - buy price) for matched trades
@@ -312,7 +307,7 @@ export const getAllAgents = async (
 
     // Calculate evolution (generation number)
     const evolution = decisions
-      ? Math.max(1, Math.floor(decisions.count / 3) + 1)
+      ? Math.max(1, Math.floor((decisions as any).count / 3) + 1)
       : 1;
 
     return {

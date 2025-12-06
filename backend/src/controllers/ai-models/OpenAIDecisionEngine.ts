@@ -1,4 +1,5 @@
 import axios, { AxiosInstance } from "axios";
+import { formatEther } from "ethers";
 import nconf from "nconf";
 
 export interface MarketAnalysis {
@@ -381,6 +382,57 @@ Provide your analysis and recommendation.`
     const response = await this.callOpenAI(newTaskPrompt);
     const tasks = this.parseTaskList(response.trim());
     return tasks;
+  }
+
+  public async getIntelligentDecision(
+    bnbBalance: string,
+    currentGoals: string,
+    currentTasks: string
+  ): Promise<{ amount: string; destination: string; reasoning: string }> {
+    const prompt = [
+      "You are an expert in generating evolving portfolio-management task lists.",
+      "",
+      "INPUT:",
+      `1. Available Balance: ${formatEther(BigInt(bnbBalance))} BNB`,
+      `2. Tasks: ${currentTasks}`,
+      `3. goals: ${currentGoals}`,
+      `4. possible addresses to send money to: ["0xA1a629d832972DB3b84A4f5Fa42d50eFF7c8F8dE"]`,
+      "",
+      "INSTRUCTIONS:",
+      "- Read the balance and the goals & tasks and decide if we should send money to a destination",
+      "Make sure we do not spend more than 90% of the available balance.",
+      "Make sure the amount is a valid BNB amount in wei format.",
+      "If you have some balance, spend it anyways but not more than 90% of the available balance.",
+      "- CRITICAL: The output must contain MAXIMUM 1 destination and amount. If you dont want to send money, return an empty array.",
+      "- CRITICAL: The output must follow the format exactly.",
+      "",
+      "OUTPUT FORMAT:",
+      "STRICTLY: Only output the JSON array, no other text or explanation. As this will be used in a code.",
+      "Return a JSON array with three outputs. A destination which is an EVM wallet and an amount which is the amount of BNB to send to the destination.",
+      "the third output is a very short summary of what you did",
+      'Example: [{"destination": "0x1234567890123456789012345678901234567890", "amount": "10000000", "reasoning": "Sent some BNB to charity" }]',
+      "Example for no decision: []",
+    ].join("\n");
+
+    console.log("prompt", prompt);
+    const response = await this.callOpenAI(prompt);
+    const lastLine = response.split("\n").pop() || "";
+    console.log("response", lastLine);
+    const jsonResponse = JSON.parse(lastLine.trim());
+
+    if (jsonResponse.length === 0) {
+      return {
+        amount: "0",
+        destination: "0x0000000000000000000000000000000000000000",
+        reasoning: "No decision made",
+      };
+    }
+
+    return {
+      amount: jsonResponse[0].amount,
+      destination: jsonResponse[0].destination,
+      reasoning: jsonResponse[0].reasoning,
+    };
   }
 
   private parseTaskList(taskString: string): string[] {

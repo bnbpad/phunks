@@ -1,8 +1,10 @@
-import { AIDecisions } from "src/database/AIDecison";
+import { AIDecisions } from "../../database/AIDecison";
 import { AgentActionRequestHandler, AgentRunner } from "./listener";
 import { AgentResponder } from "./responder";
-import { AIThesisModel } from "src/database/aiThesis";
+import { AIThesisModel } from "../../database/aiThesis";
 import { OpenAIDecisionEngine } from "../ai-models/OpenAIDecisionEngine";
+import { Actions } from "../../database/action";
+import { _getProvider } from "src/utils/contract";
 
 const run = async () => {
   const runner = new AgentRunner(1000);
@@ -60,13 +62,31 @@ const run = async () => {
         console.log("Upgrade transaction:", tx.hash);
       } else if (event.actionId.toString() == "0") {
         // perform action
-        // const tx = await responder.respondWithAction({
-        //   hash: event.hash,
-        //   to: "0xA1a629d832972DB3b84A4f5Fa42d50eFF7c8F8dE",
-        //   data: "0x",
-        //   value: "0",
-        // });
-        // console.log("Action transaction:", tx.hash);
+
+        const agentAddress = event.agentAddress;
+
+        const thesis = await AIThesisModel.findOne({
+          tokenAddress: event.agentAddress.toLowerCase(),
+        })
+          .sort({ createdAt: -1 })
+          .exec();
+        console.log("thesis", thesis, event.agentAddress);
+        if (!thesis) return;
+
+        const provider = _getProvider(56);
+        const bnbBalance = await provider.getBalance(agentAddress);
+        const intelligentDecision = await openapi.getIntelligentDecision(
+          bnbBalance.toString(),
+          thesis.goals,
+          thesis.memory
+        );
+
+        await Actions.insertOne({
+          tokenAddress: event.agentAddress.toLowerCase(),
+          amount: intelligentDecision.amount,
+          description: intelligentDecision.reasoning,
+          createdAt: new Date(),
+        });
       }
     } catch (error) {
       console.error("❌ Error processing AgentActionRequest:", error);
