@@ -5,8 +5,8 @@ import AgentLaunchpadABI from "./abi/AgentLaunchpad.json";
 export const config = {
   // API Configuration
   api: {
-    // baseURL: 'https://fd32c497428a.ngrok-free.app'
-    baseURL: "http://localhost:5005",
+    baseURL: 'https://fd32c497428a.ngrok-free.app',
+    // baseURL: "http://localhost:5005",
   },
 
   // WalletConnect Project ID (get from https://cloud.walletconnect.com)

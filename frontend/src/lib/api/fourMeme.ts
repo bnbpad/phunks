@@ -15,6 +15,7 @@ import {
 export type { CreateTokenRequest } from "../types/fourMeme";
 import axios, { AxiosHeaders, AxiosRequestConfig, AxiosResponse } from "axios";
 import { createTokenApiType } from "../hooks/useCreateFourMeme.ts";
+import { config } from '../config';
 
 const FOUR_MEME_BASE_URL = "https://four.meme/meme-api";
 
@@ -82,7 +83,7 @@ export const loginFourMeme = (data: LoginRequest): Promise<LoginResponse> => {
 };
 
 export async function invoke({
-  baseURL = "http://localhost:5005/",
+  baseURL = config.api.baseURL,
   url,
   method = "GET",
   data,
