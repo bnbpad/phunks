@@ -290,7 +290,7 @@ const Step1BasicDetails: React.FC<Step1BasicDetailsProps> = ({
           <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
             <div className="flex items-center gap-2 mb-3">
               <img src="/fourmeme.svg" alt="Four.Meme" className="w-5 h-5" />
-              <h4 className="font-exo font-semibold text-purple-900">Launching on Four.Meme DEX</h4>
+              <h4 className="font-exo font-semibold text-purple-900">Launching on Four.Meme</h4>
             </div>
             <div className="space-y-1 text-sm text-purple-700 font-exo">
               <p>• <span className="font-medium">Automatic listing</span> on Four.Meme marketplace</p>
