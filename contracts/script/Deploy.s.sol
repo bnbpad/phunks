@@ -31,7 +31,7 @@ contract DeployScript is Script {
 
         address token = address(0xe29315aF2cC7e4D69c50A962829B2C122ce94444);
 
-        agentLaunchpad.createAgent{value: 0.01 ether}(
+        agentLaunchpad.createAgent{value: 0.02 ether}(
             token, "Buy 1000 ETH", "Buy 1000 ETH", "I am a trader", "I am a trader"
         );
 

@@ -211,7 +211,7 @@ export const useCreateFourMeme = (
           abi: appConfig.contracts.agentLaunchpad.abi,
           address: appConfig.contracts.agentLaunchpad.address as `0x${string}`,
           functionName: "createAgent",
-          value: parseEther("0.01"), // Fixed 0.01 BNB fee
+          value: parseEther("0.02"), // Fixed 0.01 BNB fee
           args: [
             response.data.tokenAddress as `0x${string}`, // fourToken
             formData.aiThesis.goals, // goal

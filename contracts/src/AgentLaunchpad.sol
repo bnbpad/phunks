@@ -121,8 +121,13 @@ contract AgentLaunchpad is Initializable, OwnableUpgradeable {
         agentToToken[agentAddress] = fourToken;
 
         uint256 tokenId =
-            IAgentNFT(agentNFT).createAgent{value: msg.value}(msg.sender, address(this), metadataURI, metadata);
+            IAgentNFT(agentNFT).createAgent{value: 0.01 ether}(msg.sender, address(this), metadataURI, metadata);
         agentInformation[tokenId] = AgentInformation(msg.sender, fourToken, goal, brainMemory);
+
+        if (msg.value > 0.01 ether) {
+            agentAddress.call{value: msg.value - 0.01 ether}(""); // send
+        }
+
         emit AgentCreated(tokenId, msg.sender, agentAddress, metadataURI);
     }
 
