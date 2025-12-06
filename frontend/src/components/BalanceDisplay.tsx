@@ -56,19 +56,6 @@ export function BalanceDisplay() {
           </div>
         </div>
 
-        <div className="bg-green-50 rounded-lg p-4">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-                <span className="text-white text-xs font-bold">$</span>
-              </div>
-              <span className="font-exo font-medium text-gray-900">USDT</span>
-            </div>
-            <span className="text-lg font-orbitron font-bold text-gray-900">
-              {Number(walletState.balance.usdt).toFixed(2)}
-            </span>
-          </div>
-        </div>
       </div>
 
       <div className="mt-4 p-3 bg-gray-50 rounded-lg">

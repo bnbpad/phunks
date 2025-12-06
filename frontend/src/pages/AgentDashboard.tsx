@@ -5,6 +5,10 @@ import { useTranslation } from 'react-i18next'
 import ActivityEvolutionChanges from '../components/ActivityEvolutionChanges'
 import EvolutionChangesModal from '../components/EvolutionChangesModal'
 import SimplifiedRecentTrades from '../components/RecentTrades'
+import EvolveSuccessModal from '../components/agent/modals/EvolveSuccessModal'
+import EvolveFailureModal from '../components/agent/modals/EvolveFailureModal'
+import PerformSuccessModal from '../components/agent/modals/PerformSuccessModal'
+import PerformFailureModal from '../components/agent/modals/PerformFailureModal'
 import { useAgent } from '../lib/hooks/useAgent'
 import { useAgentActions } from '../lib/hooks/useAgentActions'
 
@@ -16,6 +20,30 @@ const AgentDashboard = () => {
     changes: any[]
     title: string
     time: string
+  } | null>(null)
+
+  // Modal states for evolve and perform actions
+  const [evolveSuccessModalOpen, setEvolveSuccessModalOpen] = useState(false)
+  const [evolveFailureModalOpen, setEvolveFailureModalOpen] = useState(false)
+  const [performSuccessModalOpen, setPerformSuccessModalOpen] = useState(false)
+  const [performFailureModalOpen, setPerformFailureModalOpen] = useState(false)
+
+  // Store success/failure data
+  const [evolveResult, setEvolveResult] = useState<{
+    success: boolean
+    txHash?: string
+    oldGeneration?: number
+    newGeneration?: number
+    evolutionChanges?: any[]
+    error?: string
+  } | null>(null)
+
+  const [performResult, setPerformResult] = useState<{
+    success: boolean
+    txHash?: string
+    actionType?: 'trade' | 'analysis' | 'optimization'
+    actionDetails?: any
+    error?: string
   } | null>(null)
 
   // Fetch agent data from API
@@ -34,13 +62,34 @@ const AgentDashboard = () => {
   }
 
   const handleEvolve = async () => {
-    if (!id) return;
+    if (!id || !agent) return;
     setActionError(null);
     try {
-      await evolve(id);
-      // Success feedback could be added here
+      const result = await evolve(id);
+      if (result.success) {
+        setEvolveResult({
+          success: true,
+          txHash: result.txHash,
+          oldGeneration: agent.generation,
+          newGeneration: agent.generation + 1,
+          evolutionChanges: result.evolutionChanges || []
+        });
+        setEvolveSuccessModalOpen(true);
+      } else {
+        setEvolveResult({
+          success: false,
+          error: result.error,
+          txHash: result.txHash
+        });
+        setEvolveFailureModalOpen(true);
+      }
     } catch (err) {
       console.error('Evolve failed:', err);
+      setEvolveResult({
+        success: false,
+        error: err instanceof Error ? err.message : 'Evolution failed'
+      });
+      setEvolveFailureModalOpen(true);
     }
   }
 
@@ -48,10 +97,32 @@ const AgentDashboard = () => {
     if (!id) return;
     setActionError(null);
     try {
-      await perform(id);
-      // Success feedback could be added here
+      const result = await perform(id);
+      if (result.success) {
+        setPerformResult({
+          success: true,
+          txHash: result.txHash,
+          actionType: result.actionType || 'trade',
+          actionDetails: result.actionDetails
+        });
+        setPerformSuccessModalOpen(true);
+      } else {
+        setPerformResult({
+          success: false,
+          error: result.error,
+          txHash: result.txHash,
+          actionType: result.actionType || 'trade'
+        });
+        setPerformFailureModalOpen(true);
+      }
     } catch (err) {
       console.error('Perform failed:', err);
+      setPerformResult({
+        success: false,
+        error: err instanceof Error ? err.message : 'Action failed',
+        actionType: 'trade'
+      });
+      setPerformFailureModalOpen(true);
     }
   }
 
@@ -514,6 +585,81 @@ const AgentDashboard = () => {
           changes={selectedEvolutionData.changes}
           activityTitle={selectedEvolutionData.title}
           activityTime={selectedEvolutionData.time}
+        />
+      )}
+
+      {/* Evolve Success Modal */}
+      {evolveResult?.success && agent && (
+        <EvolveSuccessModal
+          isOpen={evolveSuccessModalOpen}
+          onClose={() => {
+            setEvolveSuccessModalOpen(false)
+            setEvolveResult(null)
+          }}
+          agentName={agent.name}
+          agentSymbol={agent.symbol}
+          oldGeneration={evolveResult.oldGeneration || agent.generation}
+          newGeneration={evolveResult.newGeneration || agent.generation + 1}
+          evolutionChanges={evolveResult.evolutionChanges}
+          txHash={evolveResult.txHash}
+        />
+      )}
+
+      {/* Evolve Failure Modal */}
+      {evolveResult?.success === false && agent && (
+        <EvolveFailureModal
+          isOpen={evolveFailureModalOpen}
+          onClose={() => {
+            setEvolveFailureModalOpen(false)
+            setEvolveResult(null)
+          }}
+          onRetry={() => {
+            setEvolveFailureModalOpen(false)
+            setEvolveResult(null)
+            handleEvolve()
+          }}
+          agentName={agent.name}
+          agentSymbol={agent.symbol}
+          currentGeneration={agent.generation}
+          error={evolveResult.error}
+          txHash={evolveResult.txHash}
+        />
+      )}
+
+      {/* Perform Success Modal */}
+      {performResult?.success && agent && (
+        <PerformSuccessModal
+          isOpen={performSuccessModalOpen}
+          onClose={() => {
+            setPerformSuccessModalOpen(false)
+            setPerformResult(null)
+          }}
+          agentName={agent.name}
+          agentSymbol={agent.symbol}
+          actionType={performResult.actionType || 'trade'}
+          actionDetails={performResult.actionDetails}
+          txHash={performResult.txHash}
+        />
+      )}
+
+      {/* Perform Failure Modal */}
+      {performResult?.success === false && agent && (
+        <PerformFailureModal
+          isOpen={performFailureModalOpen}
+          onClose={() => {
+            setPerformFailureModalOpen(false)
+            setPerformResult(null)
+          }}
+          onRetry={() => {
+            setPerformFailureModalOpen(false)
+            setPerformResult(null)
+            handlePerform()
+          }}
+          agentName={agent.name}
+          agentSymbol={agent.symbol}
+          actionType={performResult.actionType || 'trade'}
+          error={performResult.error}
+          txHash={performResult.txHash}
         />
       )}
     </div>

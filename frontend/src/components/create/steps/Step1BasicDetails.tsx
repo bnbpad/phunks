@@ -1,5 +1,5 @@
-import React, { useRef, useState } from 'react'
-import { Upload, X, Image as ImageIcon } from 'lucide-react'
+import React, { useRef, useState, useEffect } from 'react'
+import { Upload, X, Image as ImageIcon, Shuffle } from 'lucide-react'
 import { ICreateToken } from '../../../lib/types/fourMeme'
 
 interface Step1BasicDetailsProps {
@@ -19,6 +19,46 @@ const Step1BasicDetails: React.FC<Step1BasicDetailsProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [dragActive, setDragActive] = useState(false)
+
+  // Available avatar files
+  const avatarFiles = [
+    'avatar1.png',
+    'avatar2.png',
+    'avatar3.png',
+    'avatar4.png',
+    'avatar5.png',
+    'avatar6.png',
+    'avatar7.png',
+    'avatar8.png'
+  ]
+
+  // Function to load a random avatar
+  const loadRandomAvatar = async () => {
+    try {
+      const randomIndex = Math.floor(Math.random() * avatarFiles.length)
+      const selectedAvatar = avatarFiles[randomIndex]
+      const avatarPath = `/avatars/${selectedAvatar}`
+
+      // Fetch the avatar image
+      const response = await fetch(avatarPath)
+      const blob = await response.blob()
+
+      // Create a File object from the blob
+      const file = new File([blob], selectedAvatar, { type: 'image/png' })
+
+      // Set the image
+      handleImageUpload(file)
+    } catch (error) {
+      console.error('Failed to load random avatar:', error)
+    }
+  }
+
+  // Load random avatar on component mount (only if no image is already set)
+  useEffect(() => {
+    if (!imageFile && !imagePreview && !data.basicDetails.image) {
+      loadRandomAvatar()
+    }
+  }, [])
 
   const handleInputChange = (field: keyof ICreateToken['basicDetails'], value: string) => {
     onDataChange({
@@ -178,12 +218,22 @@ const Step1BasicDetails: React.FC<Step1BasicDetailsProps> = ({
               >
                 <X className="w-4 h-4" />
               </button>
-              <button
-                onClick={openFileDialog}
-                className="mt-2 w-full px-4 py-2 bg-white border border-gray-300 rounded-lg font-exo font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-              >
-                Change Image
-              </button>
+              <div className="mt-2 flex gap-2">
+                <button
+                  onClick={openFileDialog}
+                  className="flex-1 px-4 py-2 bg-white border border-gray-300 rounded-lg font-exo font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  Change Image
+                </button>
+                <button
+                  onClick={loadRandomAvatar}
+                  className="px-4 py-2 bg-bsc-500 text-white rounded-lg font-exo font-medium hover:bg-bsc-600 transition-colors flex items-center gap-2"
+                  title="Get random avatar"
+                >
+                  <Shuffle className="w-4 h-4" />
+                  Random
+                </button>
+              </div>
             </div>
           ) : (
             <div
@@ -213,6 +263,16 @@ const Step1BasicDetails: React.FC<Step1BasicDetailsProps> = ({
                   <p className="text-sm text-gray-500 mt-2 font-exo">
                     PNG, JPG up to 5MB • Square format recommended
                   </p>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      loadRandomAvatar()
+                    }}
+                    className="mt-3 px-4 py-2 bg-bsc-500 text-white rounded-lg font-exo font-medium hover:bg-bsc-600 transition-colors flex items-center gap-2 mx-auto"
+                  >
+                    <Shuffle className="w-4 h-4" />
+                    Use Random Avatar
+                  </button>
                 </div>
               </div>
             </div>
@@ -226,16 +286,22 @@ const Step1BasicDetails: React.FC<Step1BasicDetailsProps> = ({
             className="hidden"
           />
 
-          {/* FourMeme Info */}
+          {/* Four.Meme Launch Info */}
+          {/*
           <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
-            <h4 className="font-exo font-medium text-purple-900 mb-2">🎯 Four.Meme Integration</h4>
+            <div className="flex items-center gap-2 mb-3">
+              <img src="/fourmeme.svg" alt="Four.Meme" className="w-5 h-5" />
+              <h4 className="font-exo font-semibold text-purple-900">Launching on Four.Meme</h4>
+            </div>
             <div className="space-y-1 text-sm text-purple-700 font-exo">
-              <p>• Token will be listed on Four.Meme DEX</p>
-              <p>• Fixed tokenomics: 1B supply, 24 BNB pool</p>
-              <p>• 0.25% trading fees, BNB base pair</p>
-              <p>• Immediate trading after launch</p>
+              <p>• <span className="font-medium">Automatic listing</span> on Four.Meme marketplace</p>
+              <p>• <span className="font-medium">Fixed tokenomics:</span> 1B supply, 24 BNB liquidity pool</p>
+              <p>• <span className="font-medium">Low fees:</span> 0.25% trading fees, BNB base pair</p>
+              <p>• <span className="font-medium">Instant trading</span> available immediately after launch</p>
+              <p>• <span className="font-medium">High visibility</span> on premier meme token platform</p>
             </div>
           </div>
+          */}
         </div>
       </div>
 

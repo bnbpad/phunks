@@ -137,6 +137,7 @@ const Step2SocialLinks: React.FC<Step2SocialLinksProps> = ({
       </div>
 
       {/* Community Building Tips */}
+      {/*
       <div className="bg-gradient-to-r from-bsc-50 to-purple-50 rounded-lg p-6 border border-bsc-200">
         <h4 className="font-orbitron font-bold text-gray-900 mb-4">
           🚀 Community Building Tips
@@ -152,8 +153,10 @@ const Step2SocialLinks: React.FC<Step2SocialLinksProps> = ({
           </div>
         </div>
       </div>
+      */}
 
       {/* Progress Indicator */}
+      {/*
       <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 bg-bsc-500 rounded-full"></div>
@@ -165,13 +168,16 @@ const Step2SocialLinks: React.FC<Step2SocialLinksProps> = ({
           All links are optional
         </span>
       </div>
+      */}
 
       {/* Next Step Preview */}
+      {/*
       <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
         <p className="text-blue-700 font-exo text-sm">
           <strong>Next:</strong> Configure AI trading agent (optional) for automated token trading
         </p>
       </div>
+      */}
     </div>
   )
 }

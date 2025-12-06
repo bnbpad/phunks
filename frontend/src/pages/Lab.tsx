@@ -127,17 +127,30 @@ const Lab = () => {
           </div>
 
           <div className="relative flex justify-center">
-            <div className="w-80 h-80 relative ai-pattern">
-              {/* Clean AI visualization */}
-              <div className="absolute inset-0 bg-bsc-50 rounded-lg flex items-center justify-center">
-                <div className="relative">
-                  {/* BSC-inspired diamond elements */}
-                  <div className="w-32 h-32 bg-bsc-500 diamond-shape absolute top-8 left-8 opacity-20"></div>
-                  <div className="w-24 h-24 bg-bsc-400 diamond-shape absolute top-12 left-12 opacity-40"></div>
-                  <div className="w-16 h-16 bg-bsc-600 diamond-shape absolute top-16 left-16"></div>
-                  <Brain className="w-16 h-16 text-white absolute top-20 left-20" />
+            <div className="w-80 h-80 relative">
+              {/* Random Phunk Images Display */}
+              <div className="grid grid-cols-2 gap-4 h-full">
+                <div className="space-y-4">
+                  <div className="w-full h-32 rounded-lg overflow-hidden bg-gray-100">
+                    <img src="/avatars/avatar1.png" alt="Phunk" className="w-full h-full object-cover" />
+                  </div>
+                  <div className="w-full h-32 rounded-lg overflow-hidden bg-gray-100">
+                    <img src="/avatars/avatar3.png" alt="Phunk" className="w-full h-full object-cover" />
+                  </div>
+                </div>
+                <div className="space-y-4 pt-8">
+                  <div className="w-full h-32 rounded-lg overflow-hidden bg-gray-100">
+                    <img src="/avatars/avatar5.png" alt="Phunk" className="w-full h-full object-cover" />
+                  </div>
+                  <div className="w-full h-32 rounded-lg overflow-hidden bg-gray-100">
+                    <img src="/avatars/avatar7.png" alt="Phunk" className="w-full h-full object-cover" />
+                  </div>
                 </div>
               </div>
+
+              {/* Floating elements for visual interest */}
+              <div className="absolute -top-4 -right-4 w-6 h-6 bg-bsc-500 diamond-shape opacity-60"></div>
+              <div className="absolute -bottom-4 -left-4 w-8 h-8 bg-bsc-400 diamond-shape opacity-40"></div>
             </div>
           </div>
         </div>
